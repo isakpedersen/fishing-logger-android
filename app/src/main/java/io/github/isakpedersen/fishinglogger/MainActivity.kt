@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import io.github.isakpedersen.fishinglogger.sync.WatchLink
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,6 +34,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        val watchLink = WatchLink(this, { status = it })
+        watchLink.start()
     }
 }
 
