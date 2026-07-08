@@ -1,6 +1,7 @@
 package io.github.isakpedersen.fishinglogger
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,7 +36,10 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val watchLink = WatchLink(this, { status = it })
+        val watchLink = WatchLink(
+            this,
+            { status = it },
+            { Log.d("FishingLogger", it.toString()) })
         watchLink.start()
     }
 }

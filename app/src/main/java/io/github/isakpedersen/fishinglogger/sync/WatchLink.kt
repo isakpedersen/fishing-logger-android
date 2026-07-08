@@ -3,13 +3,15 @@ package io.github.isakpedersen.fishinglogger.sync
 import android.content.Context
 import android.util.Log
 import com.garmin.android.connectiq.ConnectIQ
+import com.garmin.android.connectiq.IQApp
 import com.garmin.android.connectiq.IQDevice
 import com.garmin.android.connectiq.exception.InvalidStateException
 import com.garmin.android.connectiq.exception.ServiceUnavailableException
 
 class WatchLink(
     private val context: Context,
-    private val onStatus: (String) -> Unit
+    private val onStatus: (String) -> Unit,
+    private val onMessage: (Any) -> Unit
 ) {
     private lateinit var connectIQ: ConnectIQ
     private var device: IQDevice? = null
@@ -51,6 +53,8 @@ class WatchLink(
             connectIQ.registerForDeviceEvents(watch) { _, changedStatus ->
                 onStatus("${watch.friendlyName}: ${changedStatus.name}")
             }
+
+            findApp(watch)
         } catch (e: InvalidStateException) {
             onStatus("SDK i ugyldig tilstand")
             Log.d("WatchLink", "findWatch failed", e)
@@ -58,5 +62,25 @@ class WatchLink(
             onStatus("Får ikke kontakt med Garmin Connect")
             Log.d("WatchLink", "findWatch failed", e)
         }
+    }
+
+    private fun findApp(watch: IQDevice) {
+        connectIQ.getApplicationInfo(WATCH_APP_UUID, watch, object : ConnectIQ.IQApplicationInfoListener {
+            override fun onApplicationInfoReceived(app: IQApp?) {
+                onStatus("App funnet på klokka")
+            }
+
+            override fun onApplicationNotInstalled(applicationId: String?) {
+                onStatus("App ikke installert på klokka")
+            }
+        })
+
+        connectIQ.registerForAppEvents(watch, IQApp(WATCH_APP_UUID)) { _, _, message, _ ->
+            onMessage(message)
+        }
+    }
+
+    companion object {
+        private const val WATCH_APP_UUID = "5710521e23c14252b64384f546ea4d25"
     }
 }
