@@ -16,8 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import io.github.isakpedersen.fishinglogger.sync.WatchLink
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private var status by mutableStateOf("Starter...")
@@ -41,6 +44,10 @@ class MainActivity : ComponentActivity() {
             { status = it },
             { Log.d("FishingLogger", it.toString()) })
         watchLink.start()
+
+        lifecycleScope.launch {
+            (application as FishingLoggerApp).database.catchDao().getAll().first()
+        }
     }
 }
 
