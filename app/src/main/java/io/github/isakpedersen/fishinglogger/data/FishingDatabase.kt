@@ -9,4 +9,6 @@ import androidx.room.RoomDatabase
 )
 abstract class FishingDatabase : RoomDatabase() {
     abstract fun catchDao(): CatchDao
+
+    abstract fun lureDao(): LureDao
 }
