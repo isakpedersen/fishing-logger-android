@@ -42,11 +42,26 @@ class WatchLink(
     }
 
     suspend fun handleLureRequest() {
+        val watch = device ?: run {
+            onStatus("Ingen klokke tilkoblet")
+            return
+        }
         val lureModels = lureDao.getLureModels()
         val lureVariants = lureDao.getActiveLureVariants()
         val catalogTree = composeLureCatalog(lureModels, lureVariants)
         val message = mapOf("type" to "lure_catalog", "lures" to catalogTree.map { it.toWire() })
-        Log.d("WatchLink", "lure_catalog: $message")
+
+        try {
+            connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
+                Log.d("WatchLink", "lure_catalog send: ${status.name}")
+            }
+        } catch (e: InvalidStateException) {
+            onStatus("Kunne ikke sende sluker. SDK i ugyldig tilstand")
+            Log.d("WatchLink", "sending lure_catalog failed", e)
+        } catch (e: ServiceUnavailableException) {
+            onStatus("Kunne ikke sende sluker. Får ikke kontakt med Garmin Connect")
+            Log.d("WatchLink", "sending lure_catalog failed", e)
+        }
     }
 
     private fun findWatch() {
