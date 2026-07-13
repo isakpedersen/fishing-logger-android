@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import io.github.isakpedersen.fishinglogger.sync.WatchLink
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -42,11 +41,13 @@ class MainActivity : ComponentActivity() {
         val watchLink = WatchLink(
             this,
             { status = it },
-            { Log.d("FishingLogger", it.toString()) })
+            { Log.d("FishingLogger", it.toString()) },
+            (application as FishingLoggerApp).database.lureDao()
+        )
         watchLink.start()
 
         lifecycleScope.launch {
-            (application as FishingLoggerApp).database.catchDao().getAll().first()
+            watchLink.handleLureRequest()
         }
     }
 }

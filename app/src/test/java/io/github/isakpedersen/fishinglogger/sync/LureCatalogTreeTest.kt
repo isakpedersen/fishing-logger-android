@@ -65,4 +65,37 @@ class LureCatalogTreeTest {
 
         assertEquals(expected, composeLureCatalog(models, variants))
     }
+
+    @Test
+    fun `toWire converts a node with leaves to nested maps`() {
+        val tree = Node(
+            label = "Sølv",
+            items = listOf(
+                Leaf(
+                    label = "12 g",
+                    id = 1
+                ),
+                Leaf(
+                    label = "15 g",
+                    id = 2
+                )
+            )
+        )
+
+        val expected = mapOf(
+            "label" to "Sølv",
+            "items" to listOf(
+                mapOf(
+                    "label" to "12 g",
+                    "id" to 1L
+                ),
+                mapOf(
+                    "label" to "15 g",
+                    "id" to 2L
+                )
+            )
+        )
+
+        assertEquals(expected, tree.toWire())
+    }
 }

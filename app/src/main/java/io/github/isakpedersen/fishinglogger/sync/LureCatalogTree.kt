@@ -28,6 +28,11 @@ fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): Li
     }
 }
 
+fun CatalogItem.toWire(): Map<String, Any> = when (this) {
+    is Leaf -> mapOf("label" to label, "id" to id)
+    is Node -> mapOf("label" to label, "items" to items.map { it.toWire() })
+}
+
 private fun typeLabel(type: LureType): String = when (type) {
     LureType.SLUK -> "Sluk"
     LureType.SPINNER -> "Spinner"

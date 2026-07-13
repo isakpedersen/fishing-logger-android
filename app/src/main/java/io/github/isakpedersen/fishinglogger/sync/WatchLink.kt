@@ -7,11 +7,13 @@ import com.garmin.android.connectiq.IQApp
 import com.garmin.android.connectiq.IQDevice
 import com.garmin.android.connectiq.exception.InvalidStateException
 import com.garmin.android.connectiq.exception.ServiceUnavailableException
+import io.github.isakpedersen.fishinglogger.data.LureDao
 
 class WatchLink(
     private val context: Context,
     private val onStatus: (String) -> Unit,
-    private val onMessage: (Any) -> Unit
+    private val onMessage: (Any) -> Unit,
+    private val lureDao: LureDao
 ) {
     private lateinit var connectIQ: ConnectIQ
     private var device: IQDevice? = null
@@ -34,6 +36,14 @@ class WatchLink(
     fun start() {
         connectIQ = ConnectIQ.getInstance(context, ConnectIQ.IQConnectType.WIRELESS)
         connectIQ.initialize(context, true, sdkListener)
+    }
+
+    suspend fun handleLureRequest() {
+        val lureModels = lureDao.getLureModels()
+        val lureVariants = lureDao.getActiveLureVariants()
+        val catalogTree = composeLureCatalog(lureModels, lureVariants)
+        val message = mapOf("type" to "lure_catalog", "lures" to catalogTree.map { it.toWire() })
+        Log.d("WatchLink", "lure_catalog: $message")
     }
 
     private fun findWatch() {
