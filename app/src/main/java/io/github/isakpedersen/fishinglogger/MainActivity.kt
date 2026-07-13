@@ -39,10 +39,11 @@ class MainActivity : ComponentActivity() {
         }
 
         val watchLink = WatchLink(
-            this,
-            { status = it },
-            { Log.d("FishingLogger", it.toString()) },
-            (application as FishingLoggerApp).database.lureDao(),
+            context = this,
+            scope = lifecycleScope,
+            lureDao = (application as FishingLoggerApp).database.lureDao(),
+            onStatus = { status = it },
+            onMessage = { Log.d("FishingLogger", it.toString()) },
         )
         watchLink.start()
 

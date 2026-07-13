@@ -8,12 +8,15 @@ import com.garmin.android.connectiq.IQDevice
 import com.garmin.android.connectiq.exception.InvalidStateException
 import com.garmin.android.connectiq.exception.ServiceUnavailableException
 import io.github.isakpedersen.fishinglogger.data.LureDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class WatchLink(
     private val context: Context,
+    private val scope: CoroutineScope,
+    private val lureDao: LureDao,
     private val onStatus: (String) -> Unit,
     private val onMessage: (Any) -> Unit,
-    private val lureDao: LureDao,
 ) {
     private lateinit var connectIQ: ConnectIQ
     private var device: IQDevice? = null
@@ -89,7 +92,12 @@ class WatchLink(
         )
 
         connectIQ.registerForAppEvents(watch, IQApp(WATCH_APP_UUID)) { _, _, message, _ ->
-            onMessage(message)
+            val payload = message.firstOrNull()
+            if (payload is Map<*, *> && payload["type"] == "lure_request") {
+                scope.launch { handleLureRequest() }
+            } else {
+                onMessage(message)
+            }
         }
     }
 
