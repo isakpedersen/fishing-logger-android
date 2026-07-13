@@ -9,15 +9,15 @@ import androidx.room.PrimaryKey
 @Entity(
     indices = [
         Index(value = ["timestamp"], unique = true),
-        Index(value = ["lureVariantId"])
+        Index(value = ["lureVariantId"]),
     ],
     foreignKeys = [
         ForeignKey(
             entity = LureVariant::class,
             parentColumns = ["id"],
-            childColumns = ["lureVariantId"]
-        )
-    ]
+            childColumns = ["lureVariantId"],
+        ),
+    ],
 )
 data class Catch(
     @PrimaryKey(autoGenerate = true)
@@ -31,7 +31,7 @@ data class Catch(
     val lon: Double?,
     val lureVariantId: Long?,
     val rig: Rig?,
-    val notes: String?
+    val notes: String?,
 )
 
 /** Constant names are persisted as TEXT — renaming after real data exists is a data migration */

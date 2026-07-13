@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [Catch::class, LureVariant::class, LureModel::class],
-    version = 1
+    version = 1,
 )
 abstract class FishingDatabase : RoomDatabase() {
     abstract fun catchDao(): CatchDao

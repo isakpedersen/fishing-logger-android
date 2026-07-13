@@ -13,7 +13,7 @@ class WatchLink(
     private val context: Context,
     private val onStatus: (String) -> Unit,
     private val onMessage: (Any) -> Unit,
-    private val lureDao: LureDao
+    private val lureDao: LureDao,
 ) {
     private lateinit var connectIQ: ConnectIQ
     private var device: IQDevice? = null
@@ -75,15 +75,18 @@ class WatchLink(
     }
 
     private fun findApp(watch: IQDevice) {
-        connectIQ.getApplicationInfo(WATCH_APP_UUID, watch, object : ConnectIQ.IQApplicationInfoListener {
-            override fun onApplicationInfoReceived(app: IQApp?) {
-                onStatus("App funnet på klokka")
-            }
+        connectIQ.getApplicationInfo(
+            WATCH_APP_UUID, watch,
+            object : ConnectIQ.IQApplicationInfoListener {
+                override fun onApplicationInfoReceived(app: IQApp?) {
+                    onStatus("App funnet på klokka")
+                }
 
-            override fun onApplicationNotInstalled(applicationId: String?) {
-                onStatus("App ikke installert på klokka")
-            }
-        })
+                override fun onApplicationNotInstalled(applicationId: String?) {
+                    onStatus("App ikke installert på klokka")
+                }
+            },
+        )
 
         connectIQ.registerForAppEvents(watch, IQApp(WATCH_APP_UUID)) { _, _, message, _ ->
             onMessage(message)

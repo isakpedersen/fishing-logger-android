@@ -24,6 +24,7 @@ class LureCatalogTreeTest {
             LureVariant(id = 6, lureModelId = 4, color = null, weight = null, length = null),
         )
 
+        // @formatter:off
         val expected = listOf(
             Node("Sluk", listOf(
                 Node("Remen", listOf(
@@ -62,6 +63,7 @@ class LureCatalogTreeTest {
                 ))
             ))
         )
+        // @formatter:on
 
         assertEquals(expected, composeLureCatalog(models, variants))
     }
@@ -86,6 +88,7 @@ class LureCatalogTreeTest {
             LureVariant(id = 1, lureModelId = 1, color = "C/R", weight = 10.0, length = null),
         )
 
+        // @formatter:off
         val expected = listOf(
             Node("Sluk", listOf(
                 Node("Remen", listOf(
@@ -97,6 +100,7 @@ class LureCatalogTreeTest {
                 ))
             ))
         )
+        // @formatter:on
 
         assertEquals(expected, composeLureCatalog(models, variants))
     }
@@ -112,6 +116,7 @@ class LureCatalogTreeTest {
             LureVariant(id = 3, lureModelId = 1, color = "C/R", weight = 10.0, length = 7.5),
         )
 
+        // @formatter:off
         val expected = listOf(
             Node("Sluk", listOf(
                 Node("Remen", listOf(
@@ -125,49 +130,30 @@ class LureCatalogTreeTest {
                 ))
             ))
         )
+        // @formatter:on
 
         assertEquals(expected, composeLureCatalog(models, variants))
     }
 
     @Test
     fun `toWire converts a nested tree to nested maps`() {
-        val tree = Node(
-            label = "Spesial Classic",
-            items = listOf(
-                Node(
-                    label = "Sølv",
-                    items = listOf(
-                        Leaf(
-                            label = "12 g",
-                            id = 1
-                        ),
-                        Leaf(
-                            label = "15 g",
-                            id = 2
-                        )
-                    )
-                )
-            )
-        )
+        // @formatter:off
+        val tree = Node("Spesial Classic", listOf(
+            Node("Sølv", listOf(
+                Leaf("12 g", id = 1,),
+                Leaf("15 g", id = 2,),
+            ))
+        ))
+        // @formatter:on
 
-        val expected = mapOf(
-            "label" to "Spesial Classic",
-            "items" to listOf(
-                mapOf(
-                    "label" to "Sølv",
-                    "items" to listOf(
-                        mapOf(
-                            "label" to "12 g",
-                            "id" to 1L
-                        ),
-                        mapOf(
-                            "label" to "15 g",
-                            "id" to 2L
-                        )
-                    )
-                )
-            )
-        )
+        // @formatter:off
+        val expected = mapOf("label" to "Spesial Classic", "items" to listOf(
+            mapOf("label" to "Sølv", "items" to listOf(
+                mapOf("label" to "12 g", "id" to 1L,),
+                mapOf("label" to "15 g", "id" to 2L,),
+            ))
+        ))
+        // @formatter:on
 
         assertEquals(expected, tree.toWire())
     }

@@ -12,7 +12,7 @@ data class LureModel(
     val id: Long = 0,
     val type: LureType,
     val name: String,
-    val brand: String?
+    val brand: String?,
 )
 
 /** Constant names are persisted as TEXT — renaming after real data exists is a data migration. */
@@ -21,15 +21,15 @@ enum class LureType { SLUK, SPINNER, WOBBLER, FLUE, MARK }
 /** A lure variant, e.g. "(Sluk) Remen Møresilda C/R 10 g". */
 @Entity(
     indices = [
-        Index(value = ["lureModelId"])
+        Index(value = ["lureModelId"]),
     ],
     foreignKeys = [
         ForeignKey(
             entity = LureModel::class,
             parentColumns = ["id"],
-            childColumns = ["lureModelId"]
-        )
-    ]
+            childColumns = ["lureModelId"],
+        ),
+    ],
 )
 data class LureVariant(
     @PrimaryKey(autoGenerate = true)

@@ -21,9 +21,9 @@ fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): Li
                 val brandLabel = brand ?: "Uten merke"
                 Node(
                     label = brandLabel,
-                    items = modelsOfBrand.map { modelSubtree(it, variantsByModel.getValue(it.id)) }
+                    items = modelsOfBrand.map { modelSubtree(it, variantsByModel.getValue(it.id)) },
                 )
-            }
+            },
         )
     }
 }
@@ -50,14 +50,14 @@ private fun modelSubtree(model: LureModel, variants: List<LureVariant>): Catalog
             val leaves = variantsOfColor.map {
                 Leaf(
                     label = leafLabel(it),
-                    id = it.id
+                    id = it.id,
                 )
             }
             Node(
                 label = colorLabel,
-                items = leaves
+                items = leaves,
             )
-        }
+        },
     )
 }
 

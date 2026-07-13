@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     StatusScreen(
                         status = status,
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
             }
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
             this,
             { status = it },
             { Log.d("FishingLogger", it.toString()) },
-            (application as FishingLoggerApp).database.lureDao()
+            (application as FishingLoggerApp).database.lureDao(),
         )
         watchLink.start()
 
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StatusScreen(status: String, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Text("Status: $status")
     }

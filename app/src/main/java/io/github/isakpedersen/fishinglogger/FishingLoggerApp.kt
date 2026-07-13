@@ -5,11 +5,11 @@ import androidx.room.Room
 import io.github.isakpedersen.fishinglogger.data.FishingDatabase
 
 class FishingLoggerApp : Application() {
-    val database : FishingDatabase by lazy {
+    val database: FishingDatabase by lazy {
         Room.databaseBuilder(
             this,
             FishingDatabase::class.java,
-            "fishing.db"
+            "fishing.db",
         ).build()
     }
 }
