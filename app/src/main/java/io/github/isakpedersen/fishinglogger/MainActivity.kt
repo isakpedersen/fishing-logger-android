@@ -19,8 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import io.github.isakpedersen.fishinglogger.sync.WatchLink
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private var status by mutableStateOf("Starter...")
@@ -47,13 +45,6 @@ class MainActivity : ComponentActivity() {
             onMessage = { Log.d("FishingLogger", it.toString()) },
         )
         watchLink.start()
-
-        lifecycleScope.launch {
-            // Temporary: lets SDK initialize so handleLureRequest gets run
-            // successfully with a non-null device
-            delay(5_000)
-            watchLink.handleLureRequest()
-        }
     }
 }
 
