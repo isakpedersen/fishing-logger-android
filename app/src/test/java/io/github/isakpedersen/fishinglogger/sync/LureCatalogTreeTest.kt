@@ -67,31 +67,104 @@ class LureCatalogTreeTest {
     }
 
     @Test
-    fun `toWire converts a node with leaves to nested maps`() {
+    fun `empty catalog in produces empty catalog out`() {
+        val models = emptyList<LureModel>()
+        val variants = emptyList<LureVariant>()
+
+        val expected = emptyList<CatalogItem>()
+
+        assertEquals(expected, composeLureCatalog(models, variants))
+    }
+
+    @Test
+    fun `a model with no variants is omitted from the tree`() {
+        val models = listOf(
+            LureModel(id = 1, type = LureType.SLUK, name = "Møresilda", brand = "Remen"),
+            LureModel(id = 2, type = LureType.SLUK, name = "Spesial Classic", brand = "Sølvkroken"),
+        )
+        val variants = listOf(
+            LureVariant(id = 1, lureModelId = 1, color = "C/R", weight = 10.0, length = null),
+        )
+
+        val expected = listOf(
+            Node("Sluk", listOf(
+                Node("Remen", listOf(
+                    Node("Møresilda", listOf(
+                        Node("C/R", listOf(
+                            Leaf("10 g", id = 1)
+                        ))
+                    ))
+                ))
+            ))
+        )
+
+        assertEquals(expected, composeLureCatalog(models, variants))
+    }
+
+    @Test
+    fun `leaf labels show formatted decimal weight when present, otherwise length`() {
+        val models = listOf(
+            LureModel(id = 1, type = LureType.SLUK, name = "Møresilda", brand = "Remen"),
+        )
+        val variants = listOf(
+            LureVariant(id = 1, lureModelId = 1, color = "C/R", weight = 10.5, length = null),
+            LureVariant(id = 2, lureModelId = 1, color = "C/R", weight = null, length = 7.0),
+            LureVariant(id = 3, lureModelId = 1, color = "C/R", weight = 10.0, length = 7.5),
+        )
+
+        val expected = listOf(
+            Node("Sluk", listOf(
+                Node("Remen", listOf(
+                    Node("Møresilda", listOf(
+                        Node("C/R", listOf(
+                            Leaf("10.5 g", id = 1),
+                            Leaf("7 cm", id = 2),
+                            Leaf("10 g", id = 3),
+                        ))
+                    ))
+                ))
+            ))
+        )
+
+        assertEquals(expected, composeLureCatalog(models, variants))
+    }
+
+    @Test
+    fun `toWire converts a nested tree to nested maps`() {
         val tree = Node(
-            label = "Sølv",
+            label = "Spesial Classic",
             items = listOf(
-                Leaf(
-                    label = "12 g",
-                    id = 1
-                ),
-                Leaf(
-                    label = "15 g",
-                    id = 2
+                Node(
+                    label = "Sølv",
+                    items = listOf(
+                        Leaf(
+                            label = "12 g",
+                            id = 1
+                        ),
+                        Leaf(
+                            label = "15 g",
+                            id = 2
+                        )
+                    )
                 )
             )
         )
 
         val expected = mapOf(
-            "label" to "Sølv",
+            "label" to "Spesial Classic",
             "items" to listOf(
                 mapOf(
-                    "label" to "12 g",
-                    "id" to 1L
-                ),
-                mapOf(
-                    "label" to "15 g",
-                    "id" to 2L
+                    "label" to "Sølv",
+                    "items" to listOf(
+                        mapOf(
+                            "label" to "12 g",
+                            "id" to 1L
+                        ),
+                        mapOf(
+                            "label" to "15 g",
+                            "id" to 2L
+                        )
+                    )
                 )
             )
         )
