@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
             context = this,
             scope = lifecycleScope,
             lureDao = (application as FishingLoggerApp).database.lureDao(),
+            catchDao = (application as FishingLoggerApp).database.catchDao(),
             onStatus = { status = it },
             onMessage = { Log.d("FishingLogger", it.toString()) },
         )

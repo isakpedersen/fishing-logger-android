@@ -7,6 +7,7 @@ import com.garmin.android.connectiq.IQApp
 import com.garmin.android.connectiq.IQDevice
 import com.garmin.android.connectiq.exception.InvalidStateException
 import com.garmin.android.connectiq.exception.ServiceUnavailableException
+import io.github.isakpedersen.fishinglogger.data.CatchDao
 import io.github.isakpedersen.fishinglogger.data.LureDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -15,6 +16,7 @@ class WatchLink(
     private val context: Context,
     private val scope: CoroutineScope,
     private val lureDao: LureDao,
+    private val catchDao: CatchDao,
     private val onStatus: (String) -> Unit,
     private val onMessage: (Any) -> Unit,
 ) {
@@ -83,8 +85,12 @@ class WatchLink(
 
         connectIQ.registerForAppEvents(watch, IQApp(WATCH_APP_UUID)) { _, _, message, _ ->
             val payload = message.firstOrNull()
-            if (payload is Map<*, *> && payload["type"] == "lure_request") {
-                scope.launch { handleLureRequest(watch) }
+            if (payload is Map<*, *>) {
+                when (payload["type"]) {
+                    "lure_request" -> scope.launch { handleLureRequest(watch) }
+                    "export" -> scope.launch { handleExport(payload) }
+                    else -> onMessage(message)
+                }
             } else {
                 onMessage(message)
             }
@@ -108,6 +114,27 @@ class WatchLink(
             onStatus("Kunne ikke sende sluker. Får ikke kontakt med Garmin Connect")
             Log.d("WatchLink", "sending lure_catalog failed", e)
         }
+    }
+
+    private suspend fun handleExport(payload: Map<*, *>) {
+        val entries = payload["entries"] as? List<*> ?: run {
+            Log.w(
+                "WatchLink",
+                "export dropped: 'entries' missing or not a list (was ${payload["entries"]?.javaClass?.simpleName})",
+            )
+            return
+        }
+        val parsedEntries = parseEntries(entries)
+        val rowIds = catchDao.insertAll(parsedEntries)
+        val skipped = entries.size - parsedEntries.size
+        val duplicates = rowIds.count { it == -1L }
+        val inserted = rowIds.size - duplicates
+        Log.d(
+            "WatchLink",
+            "export: ${entries.size} entries, $inserted inserted, $duplicates duplicates, $skipped skipped",
+        )
+        onStatus("Lagret $inserted nye fangster")
+        // TODO: send sync ack (#4)
     }
 
     companion object {
