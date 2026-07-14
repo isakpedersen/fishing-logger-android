@@ -149,8 +149,8 @@ class LureCatalogTreeTest {
         // @formatter:off
         val expected = mapOf("label" to "Spesial Classic", "items" to listOf(
             mapOf("label" to "Sølv", "items" to listOf(
-                mapOf("label" to "12 g", "id" to 1L,),
-                mapOf("label" to "15 g", "id" to 2L,),
+                mapOf("label" to "12 g", "id" to 1,),
+                mapOf("label" to "15 g", "id" to 2,),
             ))
         ))
         // @formatter:on

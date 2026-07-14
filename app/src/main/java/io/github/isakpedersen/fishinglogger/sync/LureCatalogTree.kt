@@ -29,7 +29,7 @@ fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): Li
 }
 
 fun CatalogItem.toWire(): Map<String, Any> = when (this) {
-    is Leaf -> mapOf("label" to label, "id" to id)
+    is Leaf -> mapOf("label" to label, "id" to Math.toIntExact(id))
     is Node -> mapOf("label" to label, "items" to items.map { it.toWire() })
 }
 
