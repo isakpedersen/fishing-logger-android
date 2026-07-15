@@ -16,8 +16,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.isakpedersen.fishinglogger.sync.WatchLink
+import io.github.isakpedersen.fishinglogger.ui.CatchListScreen
+import io.github.isakpedersen.fishinglogger.ui.CatchListViewModel
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,12 +31,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val viewModel: CatchListViewModel = viewModel(factory = CatchListViewModel.Factory)
+            val catches by viewModel.catches.collectAsStateWithLifecycle(initialValue = emptyList())
             FishingLoggerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    StatusScreen(
-                        status = status,
-                        modifier = Modifier.padding(innerPadding),
-                    )
+                    Column(modifier = Modifier.padding(innerPadding)) {
+                        StatusScreen(status = status)
+                        CatchListScreen(catches = catches, modifier = Modifier.weight(1f))
+                    }
                 }
             }
         }
