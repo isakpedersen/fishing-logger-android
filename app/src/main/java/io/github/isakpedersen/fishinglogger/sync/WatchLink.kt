@@ -88,7 +88,7 @@ class WatchLink(
             if (payload is Map<*, *>) {
                 when (payload["type"]) {
                     "lure_request" -> scope.launch { handleLureRequest(watch) }
-                    "export" -> scope.launch { handleExport(payload) }
+                    "export" -> scope.launch { handleExport(watch = watch, payload = payload) }
                     else -> onMessage(message)
                 }
             } else {
@@ -116,7 +116,7 @@ class WatchLink(
         }
     }
 
-    private suspend fun handleExport(payload: Map<*, *>) {
+    private suspend fun handleExport(watch: IQDevice, payload: Map<*, *>) {
         val entries = payload["entries"] as? List<*> ?: run {
             Log.w(
                 "WatchLink",
@@ -124,8 +124,10 @@ class WatchLink(
             )
             return
         }
+
         val parsedEntries = parseEntries(entries)
         val rowIds = catchDao.insertAll(parsedEntries)
+
         val skipped = entries.size - parsedEntries.size
         val duplicates = rowIds.count { it == -1L }
         val inserted = rowIds.size - duplicates
@@ -134,7 +136,29 @@ class WatchLink(
             "export: ${entries.size} entries, $inserted inserted, $duplicates duplicates, $skipped skipped",
         )
         onStatus("Lagret $inserted nye fangster")
-        // TODO: send sync ack (#4)
+
+        val persistedTimestamps = parsedEntries.map { it.timestamp }.toSet()
+        /*  The watch compares acked timestamps against its own stored timestamps, so they must go
+            back to the watch as the exact same type it was sent as. Therefore, .toLong() is only
+            used for the comparison and never for the actual value sent back to the watch.  */
+        val timestamps = entries
+            .mapNotNull { (it as? Map<*, *>)?.get("timestamp") as? Number }
+            .filter { it.toLong() in persistedTimestamps }
+        sendExportAck(watch, timestamps)
+    }
+
+    private fun sendExportAck(watch: IQDevice, timestamps: List<Number>) {
+        val message = mapOf("type" to "export_ack", "timestamps" to timestamps)
+
+        try {
+            connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
+                Log.d("WatchLink", "export_ack: ${status.name}")
+            }
+        } catch (e: InvalidStateException) {
+            Log.d("WatchLink", "sending export_ack failed", e)
+        } catch (e: ServiceUnavailableException) {
+            Log.d("WatchLink", "sending export_ack failed", e)
+        }
     }
 
     companion object {
