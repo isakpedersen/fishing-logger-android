@@ -4,18 +4,20 @@ import android.util.Log
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.data.Rig
 
+private const val TAG = "ExportParser"
+
 fun parseEntries(entries: List<*>, knownVariantIds: Set<Long>): List<Catch> =
     entries.mapNotNull { parseEntry(it, knownVariantIds) }
 
 private fun parseEntry(entry: Any?, knownVariantIds: Set<Long>): Catch? {
     if (entry !is Map<*, *>) {
-        Log.w("ExportParser", "entry skipped: not a map (was ${entry?.javaClass?.simpleName})")
+        Log.w(TAG, "entry skipped: not a map (was ${entry?.javaClass?.simpleName})")
         return null
     }
     val timestamp = (entry["timestamp"] as? Number)?.toLong()
     if (timestamp == null) {
         Log.w(
-            "ExportParser",
+            TAG,
             "entry skipped: timestamp missing or not a number (was ${entry["timestamp"]?.javaClass?.simpleName})",
         )
         return null
@@ -40,7 +42,7 @@ private fun parseCoords(value: Any?): Pair<Double?, Double?> {
         return Pair(null, null)
     }
     if (value !is List<*>) {
-        Log.w("ExportParser", "coords dropped: not a list (was $value)")
+        Log.w(TAG, "coords dropped: not a list (was $value)")
         return Pair(null, null)
     }
 
@@ -48,7 +50,7 @@ private fun parseCoords(value: Any?): Pair<Double?, Double?> {
     val lon = value.getOrNull(1) as? Number
 
     if (lat == null || lon == null) {
-        Log.w("ExportParser", "coords dropped: expected [lat, lon] numbers (was $value)")
+        Log.w(TAG, "coords dropped: expected [lat, lon] numbers (was $value)")
         return Pair(null, null)
     }
 
@@ -65,7 +67,7 @@ private fun resolveLure(value: Any?, knownVariantIds: Set<Long>): ResolvedLure =
         val integral = value.toDouble() == id.toDouble()
         when {
             !integral -> {
-                Log.w("ExportParser", "lure_variant_id not integral: $value (kept in notes)")
+                Log.w(TAG, "lure_variant_id not integral: $value (kept in notes)")
                 ResolvedLure(null, "ugyldig sluk-id: $value")
             }
 
@@ -74,14 +76,14 @@ private fun resolveLure(value: Any?, knownVariantIds: Set<Long>): ResolvedLure =
             }
 
             else -> {
-                Log.w("ExportParser", "lure_variant_id unknown: $id (kept in notes)")
+                Log.w(TAG, "lure_variant_id unknown: $id (kept in notes)")
                 ResolvedLure(null, "ukjent sluk-id: $id")
             }
         }
     }
 
     else -> {
-        Log.w("ExportParser", "lure_variant_id not a number: $value (kept in notes)")
+        Log.w(TAG, "lure_variant_id not a number: $value (kept in notes)")
         ResolvedLure(null, "ugyldig sluk-id: $value")
     }
 }
@@ -96,7 +98,7 @@ private fun parseRig(value: Any?): Rig? {
         "Glidedupp" -> Rig.GLIDEDUPP
         "Bunnmeite" -> Rig.BUNNMEITE
         else -> {
-            Log.w("ExportParser", "rig dropped: unknown value (was $value)")
+            Log.w(TAG, "rig dropped: unknown value (was $value)")
             null
         }
     }

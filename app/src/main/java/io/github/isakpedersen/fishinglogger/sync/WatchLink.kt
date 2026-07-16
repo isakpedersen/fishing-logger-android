@@ -62,10 +62,10 @@ class WatchLink(
             findApp(watch)
         } catch (e: InvalidStateException) {
             onStatus("SDK i ugyldig tilstand")
-            Log.d("WatchLink", "findWatch failed", e)
+            Log.d(TAG, "findWatch failed", e)
         } catch (e: ServiceUnavailableException) {
             onStatus("Får ikke kontakt med Garmin Connect")
-            Log.d("WatchLink", "findWatch failed", e)
+            Log.d(TAG, "findWatch failed", e)
         }
     }
 
@@ -105,21 +105,21 @@ class WatchLink(
 
         try {
             connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
-                Log.d("WatchLink", "lure_catalog send: ${status.name}")
+                Log.d(TAG, "lure_catalog send: ${status.name}")
             }
         } catch (e: InvalidStateException) {
             onStatus("Kunne ikke sende sluker. SDK i ugyldig tilstand")
-            Log.d("WatchLink", "sending lure_catalog failed", e)
+            Log.d(TAG, "sending lure_catalog failed", e)
         } catch (e: ServiceUnavailableException) {
             onStatus("Kunne ikke sende sluker. Får ikke kontakt med Garmin Connect")
-            Log.d("WatchLink", "sending lure_catalog failed", e)
+            Log.d(TAG, "sending lure_catalog failed", e)
         }
     }
 
     private suspend fun handleExport(watch: IQDevice, payload: Map<*, *>) {
         val entries = payload["entries"] as? List<*> ?: run {
             Log.w(
-                "WatchLink",
+                TAG,
                 "export dropped: 'entries' missing or not a list (was ${payload["entries"]?.javaClass?.simpleName})",
             )
             return
@@ -133,7 +133,7 @@ class WatchLink(
         val duplicates = rowIds.count { it == -1L }
         val inserted = rowIds.size - duplicates
         Log.d(
-            "WatchLink",
+            TAG,
             "export: ${entries.size} entries, $inserted inserted, $duplicates duplicates, $skipped skipped",
         )
         onStatus("Lagret $inserted nye fangster")
@@ -153,16 +153,17 @@ class WatchLink(
 
         try {
             connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
-                Log.d("WatchLink", "export_ack: ${status.name}")
+                Log.d(TAG, "export_ack: ${status.name}")
             }
         } catch (e: InvalidStateException) {
-            Log.d("WatchLink", "sending export_ack failed", e)
+            Log.d(TAG, "sending export_ack failed", e)
         } catch (e: ServiceUnavailableException) {
-            Log.d("WatchLink", "sending export_ack failed", e)
+            Log.d(TAG, "sending export_ack failed", e)
         }
     }
 
     companion object {
         private const val WATCH_APP_UUID = "5710521e23c14252b64384f546ea4d25"
+        private const val TAG = "WatchLink"
     }
 }

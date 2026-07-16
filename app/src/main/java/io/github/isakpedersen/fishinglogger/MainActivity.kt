@@ -49,9 +49,13 @@ class MainActivity : ComponentActivity() {
             lureDao = (application as FishingLoggerApp).database.lureDao(),
             catchDao = (application as FishingLoggerApp).database.catchDao(),
             onStatus = { status = it },
-            onMessage = { Log.d("FishingLogger", it.toString()) },
+            onMessage = { Log.d(TAG, it.toString()) },
         )
         watchLink.start()
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }
 
