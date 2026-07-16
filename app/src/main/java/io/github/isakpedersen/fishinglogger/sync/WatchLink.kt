@@ -125,7 +125,8 @@ class WatchLink(
             return
         }
 
-        val parsedEntries = parseEntries(entries)
+        val knownVariantIds = lureDao.getAllLureVariantIds().toSet()
+        val parsedEntries = parseEntries(entries, knownVariantIds)
         val rowIds = catchDao.insertAll(parsedEntries)
 
         val skipped = entries.size - parsedEntries.size

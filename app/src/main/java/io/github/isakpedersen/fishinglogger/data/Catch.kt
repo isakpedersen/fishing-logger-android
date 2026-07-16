@@ -31,6 +31,7 @@ data class Catch(
     val lon: Double?,
     val lureVariantId: Long?,
     val rig: Rig?,
+    /** Phone-only — never travels to or from the watch. The export parser writes lure failures here. */
     val notes: String?,
 )
 

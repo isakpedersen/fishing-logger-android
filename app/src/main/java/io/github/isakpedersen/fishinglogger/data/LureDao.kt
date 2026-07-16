@@ -10,4 +10,7 @@ interface LureDao {
 
     @Query("SELECT * FROM LureVariant WHERE archived = 0")
     suspend fun getActiveLureVariants(): List<LureVariant>
+
+    @Query("SELECT id FROM LureVariant")
+    suspend fun getAllLureVariantIds(): List<Long>
 }

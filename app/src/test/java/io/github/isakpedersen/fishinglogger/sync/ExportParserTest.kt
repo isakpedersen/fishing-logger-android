@@ -30,7 +30,7 @@ class ExportParserTest {
             ),
         )
 
-        val result = parseEntries(listOf(entry))
+        val result = parseEntries(listOf(entry), setOf(35L))
 
         assertEquals(expected, result)
     }
@@ -45,7 +45,7 @@ class ExportParserTest {
             nullCatch(1784067024),
         )
 
-        val result = parseEntries(listOf(entry))
+        val result = parseEntries(listOf(entry), setOf())
 
         assertEquals(expected, result)
     }
@@ -61,7 +61,7 @@ class ExportParserTest {
             nullCatch(1784067024),
         )
 
-        val result = parseEntries(listOf(entry))
+        val result = parseEntries(listOf(entry), setOf())
 
         assertEquals(expected, result)
     }
@@ -91,7 +91,7 @@ class ExportParserTest {
             ),
         )
 
-        val result = parseEntries(entries)
+        val result = parseEntries(entries, setOf())
 
         assertEquals(expected, result)
     }
@@ -112,7 +112,7 @@ class ExportParserTest {
             nullCatch(1784067024),
         )
 
-        val result = parseEntries(entries)
+        val result = parseEntries(entries, setOf())
 
         assertEquals(expected, result)
     }
@@ -140,13 +140,68 @@ class ExportParserTest {
             nullCatch(1784070308),
         )
 
-        val result = parseEntries(entries)
+        val result = parseEntries(entries, setOf())
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `an unknown lure_variant_id degrades to a note`() {
+        val entry = mapOf(
+            "timestamp" to 1784159046,
+            "lure_variant_id" to 2,
+        )
+
+        val expected = listOf(
+            nullCatch(timestamp = 1784159046, notes = "ukjent sluk-id: 2"),
+        )
+
+        val result = parseEntries(listOf(entry), setOf(1L, 3L))
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `a non-number lure_variant_id degrades to a note`() {
+        val entries = listOf(
+            mapOf(
+                "timestamp" to 1784159000,
+                "lure_variant_id" to "Garbage id",
+            ),
+            mapOf(
+                "timestamp" to 1784159100,
+                "lure_variant_id" to listOf(4),
+            ),
+        )
+
+        val expected = listOf(
+            nullCatch(timestamp = 1784159000, notes = "ugyldig sluk-id: Garbage id"),
+            nullCatch(timestamp = 1784159100, notes = "ugyldig sluk-id: [4]"),
+        )
+
+        val result = parseEntries(entries, setOf(1L, 3L))
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `a non-integral lure_variant_id degrades to a note`() {
+        val entry = mapOf(
+            "timestamp" to 1784159100,
+            "lure_variant_id" to 2.5,
+        )
+
+        val expected = listOf(
+            nullCatch(timestamp = 1784159100, notes = "ugyldig sluk-id: 2.5"),
+        )
+
+        val result = parseEntries(listOf(entry), setOf(2L, 3L))
 
         assertEquals(expected, result)
     }
 }
 
-private fun nullCatch(timestamp: Long) = Catch(
+private fun nullCatch(timestamp: Long, notes: String? = null) = Catch(
     timestamp = timestamp,
     species = null,
     weight = null,
@@ -154,5 +209,5 @@ private fun nullCatch(timestamp: Long) = Catch(
     lon = null,
     lureVariantId = null,
     rig = null,
-    notes = null,
+    notes = notes,
 )
