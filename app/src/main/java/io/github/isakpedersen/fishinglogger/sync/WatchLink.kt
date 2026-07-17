@@ -18,7 +18,6 @@ class WatchLink(
     private val lureDao: LureDao,
     private val catchDao: CatchDao,
     private val onStatus: (String) -> Unit,
-    private val onMessage: (Any) -> Unit,
 ) {
     private lateinit var connectIQ: ConnectIQ
 
@@ -84,16 +83,20 @@ class WatchLink(
         )
 
         connectIQ.registerForAppEvents(watch, IQApp(WATCH_APP_UUID)) { _, _, message, _ ->
-            val payload = message.firstOrNull()
-            if (payload is Map<*, *>) {
-                when (payload["type"]) {
-                    "lure_request" -> scope.launch { handleLureRequest(watch) }
-                    "export" -> scope.launch { handleExport(watch = watch, payload = payload) }
-                    else -> onMessage(message)
-                }
-            } else {
-                onMessage(message)
+            handleMessage(watch, message)
+        }
+    }
+
+    private fun handleMessage(watch: IQDevice, message: List<Any?>?) {
+        val payload = message?.firstOrNull()
+        if (payload is Map<*, *>) {
+            when (payload["type"]) {
+                "lure_request" -> scope.launch { handleLureRequest(watch) }
+                "export" -> scope.launch { handleExport(watch = watch, payload = payload) }
+                else -> Log.w(TAG, "unhandled watch message: $message")
             }
+        } else {
+            Log.w(TAG, "unhandled watch message: $message")
         }
     }
 

@@ -1,7 +1,6 @@
 package io.github.isakpedersen.fishinglogger
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -49,7 +48,6 @@ class MainActivity : ComponentActivity() {
             lureDao = (application as FishingLoggerApp).database.lureDao(),
             catchDao = (application as FishingLoggerApp).database.catchDao(),
             onStatus = { status = it },
-            onMessage = { Log.w(TAG, "unhandled watch message: $it") },
         )
         watchLink.start()
     }
