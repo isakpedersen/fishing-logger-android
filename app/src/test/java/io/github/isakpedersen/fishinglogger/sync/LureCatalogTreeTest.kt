@@ -3,6 +3,7 @@ package io.github.isakpedersen.fishinglogger.sync
 import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureType
 import io.github.isakpedersen.fishinglogger.data.LureVariant
+import io.github.isakpedersen.fishinglogger.data.Rig
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -57,7 +58,7 @@ class LureCatalogTreeTest {
                 Node("Uten merke", listOf(
                     Node("Mark", listOf(
                         Node("Ukjent farge", listOf(
-                            Leaf("Ukjent vekt/lengde", id = 6)
+                            Leaf("Ukjent vekt/lengde", id = 6, rigs = listOf(Rig.OPPHENG, Rig.BUNNMEITE))
                         ))
                     ))
                 ))
@@ -156,5 +157,43 @@ class LureCatalogTreeTest {
         // @formatter:on
 
         assertEquals(expected, tree.toWire())
+    }
+
+    @Test
+    fun `toWire serializes rigs as wire names on leaves with rigs`() {
+        val leaf = Leaf(
+            label = "Mark",
+            id = 1,
+            rigs = listOf(Rig.OPPHENG, Rig.BUNNMEITE),
+        )
+
+        val expected =
+            mapOf(
+                "label" to "Mark",
+                "id" to 1,
+                "rigs" to listOf("Oppheng", "Bunnmeite"),
+            )
+
+        val result = leaf.toWire()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `toWire omits rigs key on leaves with no rigs`() {
+        val leaf = Leaf(
+            label = "12 g",
+            id = 1,
+            rigs = emptyList(),
+        )
+
+        val expected = mapOf(
+            "label" to "12 g",
+            "id" to 1,
+        )
+
+        val result = leaf.toWire()
+
+        assertEquals(expected, result)
     }
 }

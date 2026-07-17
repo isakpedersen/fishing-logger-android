@@ -35,10 +35,14 @@ data class Catch(
     val notes: String?,
 )
 
-/** Constant names are persisted as TEXT — renaming after real data exists is a data migration */
-enum class Rig(val validTypes: Set<LureType>) {
-    OPPHENG(setOf(LureType.MARK)),
-    BUNNMEITE(setOf(LureType.MARK));
+/**
+ * Constant names are persisted as TEXT in Room, and [wireName] is the string the phone
+ * sends to the watch in the lure_catalog message and compares to when parsing an export.
+ * Renaming either after real data exists is a data migration (Room) or a protocol break (watch).
+ */
+enum class Rig(val wireName: String, val validTypes: Set<LureType>) {
+    OPPHENG("Oppheng", setOf(LureType.MARK)),
+    BUNNMEITE("Bunnmeite", setOf(LureType.MARK));
 
     fun isApplicableTo(type: LureType): Boolean = type in validTypes
 }

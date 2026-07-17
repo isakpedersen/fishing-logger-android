@@ -3,10 +3,11 @@ package io.github.isakpedersen.fishinglogger.sync
 import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureType
 import io.github.isakpedersen.fishinglogger.data.LureVariant
+import io.github.isakpedersen.fishinglogger.data.Rig
 
 sealed interface CatalogItem
 data class Node(val label: String, val items: List<CatalogItem>) : CatalogItem
-data class Leaf(val label: String, val id: Long) : CatalogItem
+data class Leaf(val label: String, val id: Long, val rigs: List<Rig> = emptyList()) : CatalogItem
 
 fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): List<CatalogItem> {
     val variantsByModel = variants.groupBy { it.lureModelId }
@@ -29,7 +30,11 @@ fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): Li
 }
 
 fun CatalogItem.toWire(): Map<String, Any> = when (this) {
-    is Leaf -> mapOf("label" to label, "id" to Math.toIntExact(id))
+    is Leaf -> buildMap {
+        put("label", label)
+        put("id", Math.toIntExact(id))
+        if (rigs.isNotEmpty()) put("rigs", rigs.map { it.wireName })
+    }
     is Node -> mapOf("label" to label, "items" to items.map { it.toWire() })
 }
 
@@ -43,6 +48,7 @@ private fun typeLabel(type: LureType): String = when (type) {
 
 private fun modelSubtree(model: LureModel, variants: List<LureVariant>): CatalogItem {
     val variantsByColor = variants.groupBy { it.color }
+    val rigs = Rig.entries.filter { it.isApplicableTo(model.type) }
     return Node(
         label = model.name,
         items = variantsByColor.map { (color, variantsOfColor) ->
@@ -51,6 +57,7 @@ private fun modelSubtree(model: LureModel, variants: List<LureVariant>): Catalog
                 Leaf(
                     label = leafLabel(it),
                     id = it.id,
+                    rigs = rigs,
                 )
             }
             Node(

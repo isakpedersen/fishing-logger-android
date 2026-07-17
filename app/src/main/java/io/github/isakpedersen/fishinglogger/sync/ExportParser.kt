@@ -90,13 +90,15 @@ private fun resolveLure(value: Any?, knownVariantIds: Set<Long>): ResolvedLure =
 
 private data class ResolvedLure(val variantId: Long?, val note: String? = null)
 
-private fun resolveRig(value: Any?): ResolvedRig = when (value) {
-    null -> ResolvedRig(null)
-    "Oppheng" -> ResolvedRig(Rig.OPPHENG)
-    "Bunnmeite" -> ResolvedRig(Rig.BUNNMEITE)
-    else -> {
-        Log.w(TAG, "rig unknown: $value (kept in notes)")
-        ResolvedRig(null, "ukjent rigg: $value")
+private fun resolveRig(value: Any?): ResolvedRig {
+    val rig = Rig.entries.firstOrNull { it.wireName == value }
+    return when {
+        value == null -> ResolvedRig(null)
+        rig != null -> ResolvedRig(rig)
+        else -> {
+            Log.w(TAG, "rig unknown: $value (kept in notes)")
+            ResolvedRig(null, "ukjent rigg: $value")
+        }
     }
 }
 
