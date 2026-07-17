@@ -38,6 +38,7 @@ private fun CatchRow(catch: Catch, modifier: Modifier = Modifier) {
     ) {
         Text(formatTimestamp(catch.timestamp))
         Text(formatSpecies(catch.species), modifier = Modifier.weight(1f))
+        Text(formatNotes(catch.notes))
         Text(formatWeight(catch.weight))
     }
 }
@@ -55,6 +56,8 @@ fun formatWeight(grams: Int?): String {
     val kilos = grams / 1000.0
     return "%.2f kg".format(norwegianLocale, kilos)
 }
+
+fun formatNotes(notes: String?): String = notes ?: ""
 
 @Preview(showBackground = true)
 @Composable
