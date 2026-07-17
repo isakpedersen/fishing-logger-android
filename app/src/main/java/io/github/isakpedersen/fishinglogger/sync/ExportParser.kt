@@ -25,6 +25,10 @@ private fun parseEntry(entry: Any?, knownVariantIds: Set<Long>): Catch? {
 
     val (lat, lon) = parseCoords(entry["coords"])
     val resolvedLure = resolveLure(entry["lure_variant_id"], knownVariantIds)
+    val resolvedRig = resolveRig(entry["rig"])
+    val notes = listOfNotNull(resolvedLure.note, resolvedRig.note)
+        .joinToString(", ")
+        .ifEmpty { null }
     return Catch(
         timestamp = timestamp,
         species = entry["species"] as? String,
@@ -32,8 +36,8 @@ private fun parseEntry(entry: Any?, knownVariantIds: Set<Long>): Catch? {
         lat = lat,
         lon = lon,
         lureVariantId = resolvedLure.variantId,
-        rig = parseRig(entry["rig"]),
-        notes = resolvedLure.notes,
+        rig = resolvedRig.rig,
+        notes = notes,
     )
 }
 
@@ -58,9 +62,7 @@ private fun parseCoords(value: Any?): Pair<Double?, Double?> {
 }
 
 private fun resolveLure(value: Any?, knownVariantIds: Set<Long>): ResolvedLure = when (value) {
-    null -> {
-        ResolvedLure(null, null)
-    }
+    null -> ResolvedLure(null)
 
     is Number -> {
         val id = value.toLong()
@@ -71,9 +73,7 @@ private fun resolveLure(value: Any?, knownVariantIds: Set<Long>): ResolvedLure =
                 ResolvedLure(null, "ugyldig sluk-id: $value")
             }
 
-            id in knownVariantIds -> {
-                ResolvedLure(id, null)
-            }
+            id in knownVariantIds -> ResolvedLure(id)
 
             else -> {
                 Log.w(TAG, "lure_variant_id unknown: $id (kept in notes)")
@@ -88,17 +88,16 @@ private fun resolveLure(value: Any?, knownVariantIds: Set<Long>): ResolvedLure =
     }
 }
 
-private data class ResolvedLure(val variantId: Long?, val notes: String?)
+private data class ResolvedLure(val variantId: Long?, val note: String? = null)
 
-private fun parseRig(value: Any?): Rig? {
-    if (value == null) return null
-
-    return when (value) {
-        "Oppheng" -> Rig.OPPHENG
-        "Bunnmeite" -> Rig.BUNNMEITE
-        else -> {
-            Log.w(TAG, "rig dropped: unknown value (was $value)")
-            null
-        }
+private fun resolveRig(value: Any?): ResolvedRig = when (value) {
+    null -> ResolvedRig(null)
+    "Oppheng" -> ResolvedRig(Rig.OPPHENG)
+    "Bunnmeite" -> ResolvedRig(Rig.BUNNMEITE)
+    else -> {
+        Log.w(TAG, "rig unknown: $value (kept in notes)")
+        ResolvedRig(null, "ukjent rigg: $value")
     }
 }
+
+private data class ResolvedRig(val rig: Rig?, val note: String? = null)

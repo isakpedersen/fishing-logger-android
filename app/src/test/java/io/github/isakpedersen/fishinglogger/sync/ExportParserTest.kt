@@ -51,22 +51,6 @@ class ExportParserTest {
     }
 
     @Test
-    fun `unknown rig degrades to null`() {
-        val entry = mapOf(
-            "timestamp" to 1784067024,
-            "rig" to "This rig doesn't exist",
-        )
-
-        val expected = listOf(
-            nullCatch(1784067024),
-        )
-
-        val result = parseEntries(listOf(entry), setOf())
-
-        assertEquals(expected, result)
-    }
-
-    @Test
     fun `entry with missing timestamp is skipped, while others are parsed`() {
         val entries = listOf(
             mapOf(
@@ -196,6 +180,42 @@ class ExportParserTest {
         )
 
         val result = parseEntries(listOf(entry), setOf(2L, 3L))
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `an unknown rig degrades to a note`() {
+        val entry = mapOf(
+            "timestamp" to 1784067024,
+            "rig" to "This rig doesn't exist",
+        )
+
+        val expected = listOf(
+            nullCatch(timestamp = 1784067024, notes = "ukjent rigg: This rig doesn't exist"),
+        )
+
+        val result = parseEntries(listOf(entry), setOf())
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `unknown lure and rig degrade to a combined note`() {
+        val entry = mapOf(
+            "timestamp" to 1784297439,
+            "lure_variant_id" to 2,
+            "rig" to "Garbage rig",
+        )
+
+        val expected = listOf(
+            nullCatch(
+                timestamp = 1784297439,
+                notes = "ukjent sluk-id: 2, ukjent rigg: Garbage rig"
+            ),
+        )
+
+        val result = parseEntries(listOf(entry), setOf(1L, 3L))
 
         assertEquals(expected, result)
     }
