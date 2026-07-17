@@ -62,10 +62,10 @@ class WatchLink(
             findApp(watch)
         } catch (e: InvalidStateException) {
             onStatus("SDK i ugyldig tilstand")
-            Log.d(TAG, "findWatch failed", e)
+            Log.e(TAG, "findWatch failed", e)
         } catch (e: ServiceUnavailableException) {
             onStatus("Får ikke kontakt med Garmin Connect")
-            Log.d(TAG, "findWatch failed", e)
+            Log.e(TAG, "findWatch failed", e)
         }
     }
 
@@ -105,14 +105,18 @@ class WatchLink(
 
         try {
             connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
-                Log.d(TAG, "lure_catalog send: ${status.name}")
+                if (status == ConnectIQ.IQMessageStatus.SUCCESS) {
+                    Log.i(TAG, "lure_catalog sent")
+                } else {
+                    Log.w(TAG, "lure_catalog send failed: ${status.name}")
+                }
             }
         } catch (e: InvalidStateException) {
             onStatus("Kunne ikke sende sluker. SDK i ugyldig tilstand")
-            Log.d(TAG, "sending lure_catalog failed", e)
+            Log.w(TAG, "lure_catalog send failed", e)
         } catch (e: ServiceUnavailableException) {
             onStatus("Kunne ikke sende sluker. Får ikke kontakt med Garmin Connect")
-            Log.d(TAG, "sending lure_catalog failed", e)
+            Log.w(TAG, "lure_catalog send failed", e)
         }
     }
 
@@ -132,7 +136,7 @@ class WatchLink(
         val skipped = entries.size - parsedEntries.size
         val duplicates = rowIds.count { it == -1L }
         val inserted = rowIds.size - duplicates
-        Log.d(
+        Log.i(
             TAG,
             "export: ${entries.size} entries, $inserted inserted, $duplicates duplicates, $skipped skipped",
         )
@@ -153,12 +157,16 @@ class WatchLink(
 
         try {
             connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
-                Log.d(TAG, "export_ack: ${status.name}")
+                if (status == ConnectIQ.IQMessageStatus.SUCCESS) {
+                    Log.i(TAG, "export_ack sent")
+                } else {
+                    Log.w(TAG, "export_ack send failed: ${status.name}")
+                }
             }
         } catch (e: InvalidStateException) {
-            Log.d(TAG, "sending export_ack failed", e)
+            Log.w(TAG, "export_ack send failed", e)
         } catch (e: ServiceUnavailableException) {
-            Log.d(TAG, "sending export_ack failed", e)
+            Log.w(TAG, "export_ack send failed", e)
         }
     }
 

@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
             lureDao = (application as FishingLoggerApp).database.lureDao(),
             catchDao = (application as FishingLoggerApp).database.catchDao(),
             onStatus = { status = it },
-            onMessage = { Log.d(TAG, it.toString()) },
+            onMessage = { Log.w(TAG, "unhandled watch message: $it") },
         )
         watchLink.start()
     }
