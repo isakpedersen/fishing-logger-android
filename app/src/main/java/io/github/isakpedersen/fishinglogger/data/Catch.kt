@@ -36,4 +36,9 @@ data class Catch(
 )
 
 /** Constant names are persisted as TEXT — renaming after real data exists is a data migration */
-enum class Rig { FASTDUPP, GLIDEDUPP, BUNNMEITE }
+enum class Rig(val validTypes: Set<LureType>) {
+    OPPHENG(setOf(LureType.MARK)),
+    BUNNMEITE(setOf(LureType.MARK));
+
+    fun isApplicableTo(type: LureType): Boolean = type in validTypes
+}

@@ -94,8 +94,7 @@ private fun parseRig(value: Any?): Rig? {
     if (value == null) return null
 
     return when (value) {
-        "Fastdupp" -> Rig.FASTDUPP
-        "Glidedupp" -> Rig.GLIDEDUPP
+        "Oppheng" -> Rig.OPPHENG
         "Bunnmeite" -> Rig.BUNNMEITE
         else -> {
             Log.w(TAG, "rig dropped: unknown value (was $value)")
