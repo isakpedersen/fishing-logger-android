@@ -42,6 +42,16 @@ class WatchLink(
         connectIQ.initialize(context, true, sdkListener)
     }
 
+    fun stop() {
+        if (!::connectIQ.isInitialized) return
+        try {
+            connectIQ.unregisterAllForEvents()
+            connectIQ.shutdown(context)
+        } catch (e: InvalidStateException) {
+            Log.w(TAG, "stop failed", e)
+        }
+    }
+
     private fun findWatch() {
         try {
             // Assumes exactly one paired watch; revisit if that ever changes.

@@ -37,6 +37,11 @@ class WatchSyncViewModel(context: Context, lureDao: LureDao, catchDao: CatchDao)
         watchLink.start()
     }
 
+    override fun onCleared() {
+        watchLink.stop()
+        super.onCleared()
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
