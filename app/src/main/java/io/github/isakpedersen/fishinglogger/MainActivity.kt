@@ -8,32 +8,48 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.isakpedersen.fishinglogger.sync.WatchLink
 import io.github.isakpedersen.fishinglogger.ui.CatchListScreen
 import io.github.isakpedersen.fishinglogger.ui.CatchListViewModel
+import io.github.isakpedersen.fishinglogger.ui.WatchSyncViewModel
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
 class MainActivity : ComponentActivity() {
-    private var status by mutableStateOf("Starter...")
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val viewModel: CatchListViewModel = viewModel(factory = CatchListViewModel.Factory)
-            val catches by viewModel.catches.collectAsStateWithLifecycle(initialValue = emptyList())
+            val catchListViewModel: CatchListViewModel =
+                viewModel(factory = CatchListViewModel.Factory)
+            val watchSyncViewModel: WatchSyncViewModel =
+                viewModel(factory = WatchSyncViewModel.Factory)
+
+            val catches by catchListViewModel.catches.collectAsStateWithLifecycle(initialValue = emptyList())
+            val status by watchSyncViewModel.status.collectAsStateWithLifecycle()
+
+            val snackbarHostState = remember { SnackbarHostState() }
+
+            LaunchedEffect(Unit) {
+                watchSyncViewModel.events.collect { message ->
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
+
             FishingLoggerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = { SnackbarHost(snackbarHostState) },
+                ) { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
                         StatusScreen(status = status)
                         CatchListScreen(catches = catches, modifier = Modifier.weight(1f))
@@ -41,19 +57,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-        val watchLink = WatchLink(
-            context = this,
-            scope = lifecycleScope,
-            lureDao = (application as FishingLoggerApp).database.lureDao(),
-            catchDao = (application as FishingLoggerApp).database.catchDao(),
-            onStatus = { status = it },
-        )
-        watchLink.start()
-    }
-
-    companion object {
-        private const val TAG = "MainActivity"
     }
 }
 

@@ -18,6 +18,7 @@ class WatchLink(
     private val lureDao: LureDao,
     private val catchDao: CatchDao,
     private val onStatus: (String) -> Unit,
+    private val onEvent: (String) -> Unit,
 ) {
     private lateinit var connectIQ: ConnectIQ
 
@@ -143,7 +144,7 @@ class WatchLink(
             TAG,
             "export: ${entries.size} entries, $inserted inserted, $duplicates duplicates, $skipped skipped",
         )
-        onStatus("Lagret $inserted nye fangster")
+        onEvent("Lagret $inserted nye fangster")
 
         val persistedTimestamps = parsedEntries.map { it.timestamp }.toSet()
         /*  The watch compares acked timestamps against its own stored timestamps, so they must go
