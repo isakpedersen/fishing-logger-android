@@ -1,9 +1,11 @@
 package io.github.isakpedersen.fishinglogger.data
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 /** A lure model, e.g. "(Sluk) Remen Møresilda". */
 @Entity
@@ -43,4 +45,10 @@ data class LureVariant(
     /** Lures are archived instead of deleted so that old catches keep their reference.
      * Archived lures do not show up as an option when logging a catch. */
     val archived: Boolean = false,
+)
+
+data class Lure(
+    @Embedded val variant: LureVariant,
+    @Relation(parentColumn = "lureModelId", entityColumn = "id")
+    val model: LureModel,
 )

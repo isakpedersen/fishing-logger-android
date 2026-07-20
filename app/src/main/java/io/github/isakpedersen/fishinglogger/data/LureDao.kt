@@ -2,6 +2,7 @@ package io.github.isakpedersen.fishinglogger.data
 
 import androidx.room.Dao
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LureDao {
@@ -13,4 +14,7 @@ interface LureDao {
 
     @Query("SELECT id FROM LureVariant")
     suspend fun getAllLureVariantIds(): List<Long>
+
+    @Query("SELECT * FROM LureVariant WHERE id = :variantId")
+    fun getLure(variantId: Long): Flow<Lure?>
 }
