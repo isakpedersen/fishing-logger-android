@@ -22,6 +22,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.isakpedersen.fishinglogger.ui.CatchDetail
+import io.github.isakpedersen.fishinglogger.ui.CatchDetailScreen
+import io.github.isakpedersen.fishinglogger.ui.CatchDetailViewModel
 import io.github.isakpedersen.fishinglogger.ui.CatchList
 import io.github.isakpedersen.fishinglogger.ui.CatchListScreen
 import io.github.isakpedersen.fishinglogger.ui.CatchListViewModel
@@ -63,7 +66,21 @@ class MainActivity : ComponentActivity() {
                                 val vm: CatchListViewModel =
                                     viewModel(factory = CatchListViewModel.Factory)
                                 val catches by vm.catches.collectAsStateWithLifecycle(initialValue = emptyList())
-                                CatchListScreen(catches = catches)
+                                CatchListScreen(
+                                    catches = catches,
+                                    onCatchClick = { id ->
+                                        navController.navigate(
+                                            CatchDetail(id),
+                                        )
+                                    },
+                                )
+                            }
+
+                            composable<CatchDetail> {
+                                val vm: CatchDetailViewModel =
+                                    viewModel(factory = CatchDetailViewModel.Factory)
+                                val catch by vm.catch.collectAsStateWithLifecycle(initialValue = null)
+                                CatchDetailScreen(catch = catch)
                             }
                         }
                     }

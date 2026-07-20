@@ -13,4 +13,7 @@ interface CatchDao {
 
     @Query("SELECT * FROM Catch ORDER BY timestamp DESC")
     fun getAll(): Flow<List<Catch>>
+
+    @Query("SELECT * FROM Catch WHERE id = :id")
+    fun getById(id: Long): Flow<Catch?>
 }

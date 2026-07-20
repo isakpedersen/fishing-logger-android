@@ -1,5 +1,6 @@
 package io.github.isakpedersen.fishinglogger.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +18,11 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun CatchListScreen(catches: List<Catch>, modifier: Modifier = Modifier) {
+fun CatchListScreen(
+    catches: List<Catch>,
+    onCatchClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(
         modifier = modifier,
     ) {
@@ -25,16 +30,16 @@ fun CatchListScreen(catches: List<Catch>, modifier: Modifier = Modifier) {
             items = catches,
             key = { catch -> catch.timestamp },
         ) { catch ->
-            CatchRow(catch, Modifier.fillParentMaxWidth())
+            CatchRow(catch, onCatchClick, Modifier.fillParentMaxWidth())
         }
     }
 }
 
 @Composable
-private fun CatchRow(catch: Catch, modifier: Modifier = Modifier) {
+private fun CatchRow(catch: Catch, onCatchClick: (Long) -> Unit, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier,
+        modifier = modifier.clickable { onCatchClick(catch.id) },
     ) {
         Text(formatTimestamp(catch.timestamp))
         Text(formatSpecies(catch.species), modifier = Modifier.weight(1f))
@@ -64,13 +69,14 @@ fun formatNotes(notes: String?): String = notes ?: ""
 fun CatchListScreenPreview() {
     FishingLoggerTheme {
         CatchListScreen(
-            listOf(
+            catches = listOf(
                 previewCatch(timestamp = 1784120800, species = "Ørret", weight = 1000),
                 previewCatch(timestamp = 1784120900, species = "Røye", weight = 750),
                 previewCatch(timestamp = 1784121000, species = "Laks", weight = 9000),
                 previewCatch(timestamp = 1784121100, species = null, weight = null),
                 previewCatch(timestamp = 0, species = null, weight = null),
             ),
+            onCatchClick = { },
         )
     }
 }
