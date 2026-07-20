@@ -12,10 +12,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun CatchListScreen(
@@ -47,22 +43,6 @@ private fun CatchRow(catch: Catch, onCatchClick: (Long) -> Unit, modifier: Modif
         Text(formatWeight(catch.weight))
     }
 }
-
-private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-fun formatTimestamp(epochSeconds: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
-    Instant.ofEpochSecond(epochSeconds).atZone(zoneId).format(dateFormatter)
-
-fun formatSpecies(species: String?): String = species ?: "–"
-
-private val norwegianLocale = Locale.forLanguageTag("nb-NO")
-fun formatWeight(grams: Int?): String {
-    if (grams == null) return "–"
-
-    val kilos = grams / 1000.0
-    return "%.2f kg".format(norwegianLocale, kilos)
-}
-
-fun formatNotes(notes: String?): String = notes ?: ""
 
 @Preview(showBackground = true)
 @Composable
