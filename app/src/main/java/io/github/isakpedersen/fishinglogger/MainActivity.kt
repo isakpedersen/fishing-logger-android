@@ -19,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import io.github.isakpedersen.fishinglogger.ui.CatchList
 import io.github.isakpedersen.fishinglogger.ui.CatchListScreen
 import io.github.isakpedersen.fishinglogger.ui.CatchListViewModel
 import io.github.isakpedersen.fishinglogger.ui.WatchSyncViewModel
@@ -29,12 +33,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val catchListViewModel: CatchListViewModel =
-                viewModel(factory = CatchListViewModel.Factory)
             val watchSyncViewModel: WatchSyncViewModel =
                 viewModel(factory = WatchSyncViewModel.Factory)
 
-            val catches by catchListViewModel.catches.collectAsStateWithLifecycle(initialValue = emptyList())
             val status by watchSyncViewModel.status.collectAsStateWithLifecycle()
 
             val snackbarHostState = remember { SnackbarHostState() }
@@ -46,13 +47,25 @@ class MainActivity : ComponentActivity() {
             }
 
             FishingLoggerTheme {
+                val navController = rememberNavController()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                 ) { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
                         StatusScreen(status = status)
-                        CatchListScreen(catches = catches, modifier = Modifier.weight(1f))
+                        NavHost(
+                            navController = navController,
+                            startDestination = CatchList,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            composable<CatchList> {
+                                val vm: CatchListViewModel =
+                                    viewModel(factory = CatchListViewModel.Factory)
+                                val catches by vm.catches.collectAsStateWithLifecycle(initialValue = emptyList())
+                                CatchListScreen(catches = catches)
+                            }
+                        }
                     }
                 }
             }
