@@ -8,9 +8,20 @@ import io.github.isakpedersen.fishinglogger.FishingLoggerApp
 import io.github.isakpedersen.fishinglogger.data.LureDao
 import io.github.isakpedersen.fishinglogger.data.LureModelWithVariants
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class LureCatalogViewModel(lureDao: LureDao) : ViewModel() {
     val catalog: Flow<List<LureModelWithVariants>> = lureDao.getLureModelsWithVariants()
+
+    private val _expandedModelIds: MutableStateFlow<Set<Long>> = MutableStateFlow(emptySet())
+    val expandedModelIds: StateFlow<Set<Long>> = _expandedModelIds.asStateFlow()
+
+    fun toggleModelExpanded(id: Long) {
+        _expandedModelIds.update { ids -> if (id in ids) ids - id else ids + id }
+    }
 
     companion object {
         val Factory = viewModelFactory {

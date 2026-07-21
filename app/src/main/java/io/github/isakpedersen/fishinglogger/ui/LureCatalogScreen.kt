@@ -1,5 +1,6 @@
 package io.github.isakpedersen.fishinglogger.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,8 @@ import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 @Composable
 fun LureCatalogScreen(
     catalog: List<LureModelWithVariants>,
+    expandedModelIds: Set<Long>,
+    onModelClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (catalog.isEmpty()) {
@@ -36,9 +39,13 @@ fun LureCatalogScreen(
         ) {
             catalog.forEach { modelWithVariants ->
                 item(key = "model-${modelWithVariants.model.id}") {
-                    LureModelRow(modelWithVariants.model, Modifier.fillParentMaxWidth())
+                    LureModelRow(
+                        model = modelWithVariants.model,
+                        onClick = { onModelClick(modelWithVariants.model.id) },
+                        modifier = Modifier.fillParentMaxWidth(),
+                    )
                 }
-                if (true /* TODO: only show if model is expanded */) {
+                if (modelWithVariants.model.id in expandedModelIds) {
                     items(
                         items = modelWithVariants.variants,
                         key = { variant -> "variant-${variant.id}" },
@@ -57,9 +64,9 @@ fun LureCatalogScreen(
 }
 
 @Composable
-private fun LureModelRow(model: LureModel, modifier: Modifier = Modifier) {
+private fun LureModelRow(model: LureModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onClick),
     ) {
         Text("${model.type} ${model.name}")
     }
@@ -105,6 +112,8 @@ fun LureCatalogScreenPreview() {
                     ),
                 ),
             ),
+            expandedModelIds = setOf(1),
+            onModelClick = {},
         )
     }
 }

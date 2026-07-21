@@ -95,7 +95,12 @@ class MainActivity : ComponentActivity() {
                                 val catalog by vm.catalog.collectAsStateWithLifecycle(
                                     initialValue = emptyList(),
                                 )
-                                LureCatalogScreen(catalog = catalog)
+                                val expandedModelIds by vm.expandedModelIds.collectAsStateWithLifecycle()
+                                LureCatalogScreen(
+                                    catalog = catalog,
+                                    expandedModelIds = expandedModelIds,
+                                    onModelClick = vm::toggleModelExpanded,
+                                )
                             }
                         }
                     }
