@@ -10,6 +10,7 @@ import io.github.isakpedersen.fishinglogger.data.LureDao
 import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureModelWithVariants
 import io.github.isakpedersen.fishinglogger.data.LureType
+import io.github.isakpedersen.fishinglogger.data.LureVariant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,18 @@ class LureCatalogViewModel(private val lureDao: LureDao) : ViewModel() {
         viewModelScope.launch {
             val id = lureDao.insertLureModel(model)
             _expandedModelIds.update { it + id }
+        }
+    }
+
+    fun addVariant(lureModelId: Long, color: String?, weight: Double?, length: Double?) {
+        val variant = LureVariant(
+            lureModelId = lureModelId,
+            color = color,
+            weight = weight,
+            length = length,
+        )
+        viewModelScope.launch {
+            lureDao.insertLureVariant(variant)
         }
     }
 

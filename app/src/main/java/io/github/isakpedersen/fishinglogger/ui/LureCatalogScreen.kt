@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -31,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.LureModel
@@ -45,9 +47,11 @@ fun LureCatalogScreen(
     expandedModelIds: Set<Long>,
     onModelClick: (Long) -> Unit,
     onSaveModel: (LureType, String, String?) -> Unit,
+    onSaveVariant: (Long, String?, Double?, Double?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
+    var addVariantForModelId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     Scaffold(
         modifier = modifier,
@@ -95,7 +99,16 @@ fun LureCatalogScreen(
                             )
                         }
                         item(key = "add-variant-${modelWithVariants.model.id}") {
-                            Row(modifier = Modifier.padding(start = 20.dp)) { Text("+ Legg til") }
+                            Row(
+                                modifier = Modifier
+                                    .clickable(
+                                        onClick = {
+                                            addVariantForModelId = modelWithVariants.model.id
+                                        },
+                                    )
+                                    .fillParentMaxWidth()
+                                    .padding(start = 20.dp),
+                            ) { Text("+ Legg til") }
                         }
                     }
                 }
@@ -109,6 +122,16 @@ fun LureCatalogScreen(
             onSave = { type, name, brand ->
                 onSaveModel(type, name, brand)
                 showAddDialog = false
+            },
+        )
+    }
+
+    addVariantForModelId?.let { modelId ->
+        AddLureVariantDialog(
+            onDismiss = { addVariantForModelId = null },
+            onSave = { color, weight, length ->
+                onSaveVariant(modelId, color, weight, length)
+                addVariantForModelId = null
             },
         )
     }
@@ -192,6 +215,73 @@ private fun AddLureModelDialog(
 }
 
 @Composable
+private fun AddLureVariantDialog(
+    onDismiss: () -> Unit,
+    onSave: (String?, Double?, Double?) -> Unit,
+) {
+    var color: String by rememberSaveable { mutableStateOf("") }
+    var weightText: String by rememberSaveable { mutableStateOf("") }
+    var lengthText: String by rememberSaveable { mutableStateOf("") }
+
+    val weight = weightText.trim().replace(",", ".").toDoubleOrNull()
+    val length = lengthText.trim().replace(",", ".").toDoubleOrNull()
+
+    val weightOk = weightText.isBlank() || weight != null
+    val lengthOk = lengthText.isBlank() || length != null
+
+    AlertDialog(
+        title = {
+            Text("Ny variant")
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = color,
+                    onValueChange = { color = it },
+                    label = { Text("Farge") },
+                )
+                OutlinedTextField(
+                    value = weightText,
+                    onValueChange = { weightText = it.filter { ch -> ch.isDigit() || ch in ",." } },
+                    label = { Text("Vekt") },
+                    isError = !weightOk,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                )
+                OutlinedTextField(
+                    value = lengthText,
+                    onValueChange = { lengthText = it.filter { ch -> ch.isDigit() || ch in ",." } },
+                    label = { Text("Lengde") },
+                    isError = !lengthOk,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                )
+            }
+        },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onSave(
+                        color.trim().ifBlank { null },
+                        weight,
+                        length,
+                    )
+                },
+                enabled = weightOk && lengthOk && (color.isNotBlank() || weight != null || length != null),
+            ) {
+                Text("Lagre")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+            ) {
+                Text("Avbryt")
+            }
+        },
+    )
+}
+
+@Composable
 private fun LureModelRow(model: LureModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.clickable(onClick = onClick),
@@ -243,6 +333,7 @@ fun LureCatalogScreenPreview() {
             expandedModelIds = setOf(1),
             onModelClick = {},
             onSaveModel = { _, _, _ -> },
+            onSaveVariant = { _, _, _, _ -> },
         )
     }
 }

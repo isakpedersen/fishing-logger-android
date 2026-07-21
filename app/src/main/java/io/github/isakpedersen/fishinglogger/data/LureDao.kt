@@ -27,4 +27,7 @@ interface LureDao {
 
     @Insert
     suspend fun insertLureModel(model: LureModel): Long
+
+    @Insert
+    suspend fun insertLureVariant(variant: LureVariant): Long
 }

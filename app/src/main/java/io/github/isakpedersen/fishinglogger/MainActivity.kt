@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
                                     expandedModelIds = expandedModelIds,
                                     onModelClick = vm::toggleModelExpanded,
                                     onSaveModel = vm::addModel,
+                                    onSaveVariant = vm::addVariant,
                                 )
                             }
                         }
