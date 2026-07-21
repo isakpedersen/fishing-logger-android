@@ -24,15 +24,28 @@ fun formatWeight(grams: Int?): String {
 fun formatNotes(notes: String?): String = notes ?: ""
 
 fun formatLure(model: LureModel, variant: LureVariant): String {
+    return listOfNotNull(
+        formatLureModel(model),
+        formatLureVariant(variant).ifEmpty { null }
+    ).joinToString(" ")
+}
+
+fun formatLureModel(model: LureModel): String {
     val type = model.type.name.lowercase().replaceFirstChar { it.uppercaseChar() }
-    val weight = variant.weight?.let { formatMeasurement(it, "g") }
-    val length = variant.length?.let { formatMeasurement(it, "cm") }
-    val archived = if (variant.archived) "(arkivert)" else null
 
     return listOfNotNull(
         "($type)",
         model.brand,
         model.name,
+    ).joinToString(" ")
+}
+
+fun formatLureVariant(variant: LureVariant): String {
+    val weight = variant.weight?.let { formatMeasurement(it, "g") }
+    val length = variant.length?.let { formatMeasurement(it, "cm") }
+    val archived = if (variant.archived) "(arkivert)" else null
+
+    return listOfNotNull(
         variant.color,
         length,
         weight,
