@@ -78,6 +78,45 @@ class FormattingTest {
     }
 
     @Test
+    fun `only color set in variant`() {
+        val variant = LureVariant(
+            lureModelId = 1,
+            color = "C/R",
+            weight = null,
+            length = null,
+        )
+
+        val expected = "C/R"
+
+        val result = formatLureVariant(variant)
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `all fields null in variant leaves no trailing space`() {
+        val model = LureModel(
+            id = 1,
+            type = LureType.SLUK,
+            name = "Møresilda",
+            brand = null,
+        )
+
+        val variant = LureVariant(
+            lureModelId = 1,
+            color = null,
+            weight = null,
+            length = null,
+        )
+
+        val expected = "(Sluk) Møresilda"
+
+        val result = formatLure(model, variant)
+
+        assertEquals(expected, result)
+    }
+
+    @Test
     fun `formats a whole number with no decimals`() {
         assertEquals("7 g", formatMeasurement(7.0, "g"))
     }
