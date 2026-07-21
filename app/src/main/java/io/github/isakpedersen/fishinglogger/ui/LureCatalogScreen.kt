@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -95,7 +96,7 @@ fun LureCatalogScreen(
                                 variant,
                                 Modifier
                                     .fillParentMaxWidth()
-                                    .padding(start = 20.dp),
+                                    .padding(start = 32.dp),
                             )
                         }
                         item(key = "add-variant-${modelWithVariants.model.id}") {
@@ -106,8 +107,10 @@ fun LureCatalogScreen(
                                             addVariantForModelId = modelWithVariants.model.id
                                         },
                                     )
+                                    .heightIn(48.dp)
                                     .fillParentMaxWidth()
-                                    .padding(start = 20.dp),
+                                    .padding(start = 32.dp),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) { Text("+ Legg til") }
                         }
                     }
@@ -244,6 +247,7 @@ private fun AddLureVariantDialog(
                     value = weightText,
                     onValueChange = { weightText = it.filter { ch -> ch.isDigit() || ch in ",." } },
                     label = { Text("Vekt") },
+                    suffix = { Text("g") },
                     isError = !weightOk,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 )
@@ -251,6 +255,7 @@ private fun AddLureVariantDialog(
                     value = lengthText,
                     onValueChange = { lengthText = it.filter { ch -> ch.isDigit() || ch in ",." } },
                     label = { Text("Lengde") },
+                    suffix = { Text("cm") },
                     isError = !lengthOk,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 )
@@ -284,18 +289,23 @@ private fun AddLureVariantDialog(
 @Composable
 private fun LureModelRow(model: LureModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .heightIn(48.dp)
+            .padding(start = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("${model.type} ${model.name}")
+        Text(formatLureModel(model))
     }
 }
 
 @Composable
 private fun LureVariantRow(variant: LureVariant, modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier,
+        modifier = modifier.heightIn(48.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("${variant.weight} ${variant.color}")
+        Text(formatLureVariant(variant))
     }
 }
 
