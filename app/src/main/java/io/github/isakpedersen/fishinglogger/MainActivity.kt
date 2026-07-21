@@ -100,6 +100,7 @@ class MainActivity : ComponentActivity() {
                                     catalog = catalog,
                                     expandedModelIds = expandedModelIds,
                                     onModelClick = vm::toggleModelExpanded,
+                                    onSaveModel = vm::addModel,
                                 )
                             }
                         }
