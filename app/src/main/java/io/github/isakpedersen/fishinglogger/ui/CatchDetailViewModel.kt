@@ -6,7 +6,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
-import io.github.isakpedersen.fishinglogger.FishingLoggerApp
+import io.github.isakpedersen.fishinglogger.FishingLoggerApplication
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.data.CatchDao
 import io.github.isakpedersen.fishinglogger.data.Lure
@@ -40,7 +40,7 @@ class CatchDetailViewModel(catchDao: CatchDao, lureDao: LureDao, id: Long) : Vie
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                val app = this[APPLICATION_KEY] as FishingLoggerApp
+                val app = this[APPLICATION_KEY] as FishingLoggerApplication
                 val id = createSavedStateHandle().toRoute<CatchDetail>().id
                 CatchDetailViewModel(app.database.catchDao(), app.database.lureDao(), id)
             }

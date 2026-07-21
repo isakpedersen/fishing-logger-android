@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import io.github.isakpedersen.fishinglogger.FishingLoggerApp
+import io.github.isakpedersen.fishinglogger.FishingLoggerApplication
 import io.github.isakpedersen.fishinglogger.data.LureDao
 import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureModelWithVariants
@@ -51,7 +51,7 @@ class LureCatalogViewModel(private val lureDao: LureDao) : ViewModel() {
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                val app = this[APPLICATION_KEY] as FishingLoggerApp
+                val app = this[APPLICATION_KEY] as FishingLoggerApplication
                 LureCatalogViewModel(app.database.lureDao())
             }
         }

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import io.github.isakpedersen.fishinglogger.data.FishingDatabase
 
-class FishingLoggerApp : Application() {
+class FishingLoggerApplication : Application() {
     val database: FishingDatabase by lazy {
         Room.databaseBuilder(
             this,

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import io.github.isakpedersen.fishinglogger.FishingLoggerApp
+import io.github.isakpedersen.fishinglogger.FishingLoggerApplication
 import io.github.isakpedersen.fishinglogger.data.CatchDao
 import io.github.isakpedersen.fishinglogger.data.LureDao
 import io.github.isakpedersen.fishinglogger.sync.WatchLink
@@ -45,7 +45,7 @@ class WatchSyncViewModel(context: Context, lureDao: LureDao, catchDao: CatchDao)
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                val app = this[APPLICATION_KEY] as FishingLoggerApp
+                val app = this[APPLICATION_KEY] as FishingLoggerApplication
                 WatchSyncViewModel(
                     context = app,
                     lureDao = app.database.lureDao(),
