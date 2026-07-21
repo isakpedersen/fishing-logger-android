@@ -4,3 +4,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable object CatchList
 @Serializable data class CatchDetail(val id: Long)
+@Serializable object LureCatalog

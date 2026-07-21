@@ -52,3 +52,9 @@ data class Lure(
     @Relation(parentColumn = "lureModelId", entityColumn = "id")
     val model: LureModel,
 )
+
+data class LureModelWithVariants(
+    @Embedded val model: LureModel,
+    @Relation(parentColumn = "id", entityColumn = "lureModelId")
+    val variants: List<LureVariant>,
+)

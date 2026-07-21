@@ -29,6 +29,9 @@ import io.github.isakpedersen.fishinglogger.ui.CatchDetailViewModel
 import io.github.isakpedersen.fishinglogger.ui.CatchList
 import io.github.isakpedersen.fishinglogger.ui.CatchListScreen
 import io.github.isakpedersen.fishinglogger.ui.CatchListViewModel
+import io.github.isakpedersen.fishinglogger.ui.LureCatalog
+import io.github.isakpedersen.fishinglogger.ui.LureCatalogScreen
+import io.github.isakpedersen.fishinglogger.ui.LureCatalogViewModel
 import io.github.isakpedersen.fishinglogger.ui.WatchSyncViewModel
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
@@ -84,6 +87,15 @@ class MainActivity : ComponentActivity() {
                                     initialValue = CatchDetailUiState(null, null),
                                 )
                                 CatchDetailScreen(uiState = uiState)
+                            }
+
+                            composable<LureCatalog> {
+                                val vm: LureCatalogViewModel =
+                                    viewModel(factory = LureCatalogViewModel.Factory)
+                                val catalog by vm.catalog.collectAsStateWithLifecycle(
+                                    initialValue = emptyList(),
+                                )
+                                LureCatalogScreen(catalog = catalog)
                             }
                         }
                     }
