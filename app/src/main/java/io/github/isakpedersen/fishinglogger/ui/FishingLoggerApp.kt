@@ -3,6 +3,12 @@ package io.github.isakpedersen.fishinglogger.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -12,13 +18,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
+
+private data class NavigationTab(val route: Any, val label: String, val icon: ImageVector)
+
+private val navigationTabs = listOf(
+    NavigationTab(route = CatchList, label = "Fangster", icon = Icons.AutoMirrored.Filled.List),
+    NavigationTab(route = LureCatalog, label = "Slukkatalog", icon = Icons.Default.Star),
+)
 
 @Composable
 fun FishingLoggerApp() {
@@ -35,10 +52,32 @@ fun FishingLoggerApp() {
         }
     }
 
+    val navController = rememberNavController()
+    val currentEntry by navController.currentBackStackEntryAsState()
+
     FishingLoggerTheme {
-        val navController = rememberNavController()
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                NavigationBar {
+                    navigationTabs.forEach { tab ->
+                        NavigationBarItem(
+                            selected = currentEntry?.destination?.hasRoute(tab.route::class) == true,
+                            icon = { Icon(imageVector = tab.icon, contentDescription = null) },
+                            label = { Text(tab.label) },
+                            onClick = {
+                                navController.navigate(tab.route) {
+                                    popUpTo(id = navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                }
+            },
             snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { innerPadding ->
             Column(modifier = Modifier.padding(innerPadding)) {
@@ -55,9 +94,7 @@ fun FishingLoggerApp() {
                         CatchListScreen(
                             catches = catches,
                             onCatchClick = { id ->
-                                navController.navigate(
-                                    CatchDetail(id),
-                                )
+                                navController.navigate(CatchDetail(id))
                             },
                         )
                     }
