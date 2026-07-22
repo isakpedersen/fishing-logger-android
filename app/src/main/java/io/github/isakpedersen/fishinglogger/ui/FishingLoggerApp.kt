@@ -121,6 +121,8 @@ fun FishingLoggerApp() {
                             onModelClick = vm::toggleModelExpanded,
                             onSaveModel = vm::addModel,
                             onSaveVariant = vm::addVariant,
+                            onDeleteModel = vm::deleteModel,
+                            onDeleteVariant = vm::deleteVariant,
                         )
                     }
                 }

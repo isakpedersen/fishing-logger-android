@@ -1,6 +1,7 @@
 package io.github.isakpedersen.fishinglogger.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,10 +50,14 @@ fun LureCatalogScreen(
     onModelClick: (Long) -> Unit,
     onSaveModel: (LureType, String, String?) -> Unit,
     onSaveVariant: (Long, String?, Double?, Double?) -> Unit,
+    onDeleteModel: (Long) -> Unit,
+    onDeleteVariant: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
     var addVariantForModelId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var deleteModelId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var deleteVariantId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     Scaffold(
         modifier = modifier,
@@ -84,6 +89,7 @@ fun LureCatalogScreen(
                         LureModelRow(
                             model = modelWithVariants.model,
                             onClick = { onModelClick(modelWithVariants.model.id) },
+                            onLongClick = { deleteModelId = modelWithVariants.model.id },
                             modifier = Modifier.fillParentMaxWidth(),
                         )
                     }
@@ -93,10 +99,10 @@ fun LureCatalogScreen(
                             key = { variant -> "variant-${variant.id}" },
                         ) { variant ->
                             LureVariantRow(
-                                variant,
-                                Modifier
-                                    .fillParentMaxWidth()
-                                    .padding(start = 32.dp),
+                                variant = variant,
+                                onLongClick = { deleteVariantId = variant.id },
+                                modifier = Modifier
+                                    .fillParentMaxWidth(),
                             )
                         }
                         item(key = "add-variant-${modelWithVariants.model.id}") {
@@ -135,6 +141,28 @@ fun LureCatalogScreen(
             onSave = { color, weight, length ->
                 onSaveVariant(modelId, color, weight, length)
                 addVariantForModelId = null
+            },
+        )
+    }
+
+    deleteModelId?.let { modelId ->
+        DeleteLureDialog(
+            label = "modell",
+            onDismiss = { deleteModelId = null },
+            onDelete = {
+                onDeleteModel(modelId)
+                deleteModelId = null
+            },
+        )
+    }
+
+    deleteVariantId?.let { variantId ->
+        DeleteLureDialog(
+            label = "variant",
+            onDismiss = { deleteVariantId = null },
+            onDelete = {
+                onDeleteVariant(variantId)
+                deleteVariantId = null
             },
         )
     }
@@ -287,10 +315,35 @@ private fun AddLureVariantDialog(
 }
 
 @Composable
-private fun LureModelRow(model: LureModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun DeleteLureDialog(
+    label: String,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    AlertDialog(
+        text = {
+            Text("Vil du slette $label?")
+        },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDelete) { Text("Slett") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Avbryt") }
+        },
+    )
+}
+
+@Composable
+private fun LureModelRow(
+    model: LureModel,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier
-            .clickable(onClick = onClick)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .heightIn(48.dp)
             .padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -300,9 +353,16 @@ private fun LureModelRow(model: LureModel, onClick: () -> Unit, modifier: Modifi
 }
 
 @Composable
-private fun LureVariantRow(variant: LureVariant, modifier: Modifier = Modifier) {
+private fun LureVariantRow(
+    variant: LureVariant,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = modifier.heightIn(48.dp),
+        modifier = modifier
+            .combinedClickable(onClick = {}, onLongClick = onLongClick)
+            .heightIn(48.dp)
+            .padding(start = 32.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(formatLureVariant(variant))
@@ -344,6 +404,8 @@ fun LureCatalogScreenPreview() {
             onModelClick = {},
             onSaveModel = { _, _, _ -> },
             onSaveVariant = { _, _, _, _ -> },
+            onDeleteModel = { _ -> },
+            onDeleteVariant = { _ -> },
         )
     }
 }

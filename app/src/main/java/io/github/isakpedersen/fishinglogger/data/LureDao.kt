@@ -30,4 +30,10 @@ interface LureDao {
 
     @Insert
     suspend fun insertLureVariant(variant: LureVariant): Long
+
+    @Query("DELETE FROM LureModel WHERE id = :modelId")
+    suspend fun deleteLureModel(modelId: Long): Int
+
+    @Query("DELETE FROM LureVariant WHERE id = :variantId")
+    suspend fun deleteLureVariant(variantId: Long): Int
 }

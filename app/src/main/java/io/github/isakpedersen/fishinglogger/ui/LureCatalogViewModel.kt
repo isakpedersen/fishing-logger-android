@@ -1,5 +1,7 @@
 package io.github.isakpedersen.fishinglogger.ui
 
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -45,6 +47,28 @@ class LureCatalogViewModel(private val lureDao: LureDao) : ViewModel() {
         )
         viewModelScope.launch {
             lureDao.insertLureVariant(variant)
+        }
+    }
+
+    fun deleteModel(modelId: Long) {
+        viewModelScope.launch {
+            try {
+                lureDao.deleteLureModel(modelId)
+                Log.i("LureCatalogViewModel", "deleted model $modelId") // TODO: replace with snackbar
+            } catch (e: SQLiteConstraintException) {
+                Log.w("LureCatalogViewModel", "could not delete model $modelId", e) // TODO: replace with snackbar
+            }
+        }
+    }
+
+    fun deleteVariant(variantId: Long) {
+        viewModelScope.launch {
+            try {
+                lureDao.deleteLureVariant(variantId)
+                Log.i("LureCatalogViewModel", "deleted variant $variantId") // TODO: replace with snackbar
+            } catch (e: SQLiteConstraintException) {
+                Log.w("LureCatalogViewModel", "could not delete variant $variantId", e) // TODO: replace with snackbar
+            }
         }
     }
 
