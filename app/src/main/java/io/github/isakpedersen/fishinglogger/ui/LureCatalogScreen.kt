@@ -213,14 +213,14 @@ private fun AddLureModelDialog(
                     }
                 }
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Navn") },
-                )
-                OutlinedTextField(
                     value = brand,
                     onValueChange = { brand = it },
                     label = { Text("Merke") },
+                )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Navn") },
                 )
             }
         },
