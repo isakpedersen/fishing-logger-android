@@ -31,25 +31,25 @@ class LureCatalogTreeTest {
                 Node("Remen", listOf(
                     Node("Møresilda", listOf(
                         Node("C/R", listOf(
-                            Leaf("10 g", id = 1),
-                            Leaf("15 g", id = 2)
+                            Leaf("10 g", id = 1, type = LureType.SLUK, brand = "Remen", name = "Møresilda", color = "C/R"),
+                            Leaf("15 g", id = 2, type = LureType.SLUK, brand = "Remen", name = "Møresilda", color = "C/R")
                         ))
                     ))
                 )),
                 Node("Sølvkroken", listOf(
                     Node("Spesial Classic", listOf(
                         Node("S/D", listOf(
-                            Leaf("7 g", id = 3)
+                            Leaf("7 g", id = 3, type = LureType.SLUK, brand = "Sølvkroken", name = "Spesial Classic", color = "S/D")
                         )),
                         Node("C/R", listOf(
-                            Leaf("7 g", id = 4)
+                            Leaf("7 g", id = 4, type = LureType.SLUK, brand = "Sølvkroken", name = "Spesial Classic", color = "C/R")
                         ))
                     ))
                 )),
                 Node("Uten merke", listOf(
                     Node("Kulpkrokodill", listOf(
                         Node("Ukjent farge", listOf(
-                            Leaf("15 g", id = 5)
+                            Leaf("15 g", id = 5, type = LureType.SLUK, brand = null, name = "Kulpkrokodill", color = null)
                         ))
                     ))
                 ))
@@ -58,7 +58,7 @@ class LureCatalogTreeTest {
                 Node("Uten merke", listOf(
                     Node("Mark", listOf(
                         Node("Ukjent farge", listOf(
-                            Leaf("Ukjent vekt/lengde", id = 6, rigs = listOf(Rig.OPPHENG, Rig.BUNNMEITE))
+                            Leaf("Ukjent vekt/lengde", id = 6, type = LureType.MARK, brand = null, name = "Mark", color = null, rigs = listOf(Rig.OPPHENG, Rig.BUNNMEITE))
                         ))
                     ))
                 ))
@@ -95,7 +95,7 @@ class LureCatalogTreeTest {
                 Node("Remen", listOf(
                     Node("Møresilda", listOf(
                         Node("C/R", listOf(
-                            Leaf("10 g", id = 1)
+                            Leaf("10 g", id = 1, type = LureType.SLUK, brand = "Remen", name = "Møresilda", color = "C/R")
                         ))
                     ))
                 ))
@@ -123,9 +123,9 @@ class LureCatalogTreeTest {
                 Node("Remen", listOf(
                     Node("Møresilda", listOf(
                         Node("C/R", listOf(
-                            Leaf("10.5 g", id = 1),
-                            Leaf("7 cm", id = 2),
-                            Leaf("10 g", id = 3),
+                            Leaf("10.5 g", id = 1, type = LureType.SLUK, brand = "Remen", name = "Møresilda", color = "C/R"),
+                            Leaf("7 cm", id = 2, type = LureType.SLUK, brand = "Remen", name = "Møresilda", color = "C/R"),
+                            Leaf("10 g", id = 3, type = LureType.SLUK, brand = "Remen", name = "Møresilda", color = "C/R"),
                         ))
                     ))
                 ))
@@ -139,19 +139,27 @@ class LureCatalogTreeTest {
     @Test
     fun `toWire converts a nested tree to nested maps`() {
         // @formatter:off
-        val tree = Node("Spesial Classic", listOf(
-            Node("Sølv", listOf(
-                Leaf("12 g", id = 1,),
-                Leaf("15 g", id = 2,),
+        val tree = Node("Sluk", listOf(
+                Node("Sølvkroken", listOf(
+                    Node("Spesial Classic", listOf(
+                        Node("Sølv", listOf(
+                            Leaf("12 g", id = 1, type = LureType.SLUK, brand = "Sølvkroken", name = "Spesial Classic", color = "Sølv"),
+                            Leaf("15 g", id = 2, type = LureType.SLUK, brand = "Sølvkroken", name = "Spesial Classic", color = "Sølv"),
+                        ))
+                    ))
+                ))
             ))
-        ))
         // @formatter:on
 
         // @formatter:off
-        val expected = mapOf("label" to "Spesial Classic", "items" to listOf(
-            mapOf("label" to "Sølv", "items" to listOf(
-                mapOf("label" to "12 g", "id" to 1,),
-                mapOf("label" to "15 g", "id" to 2,),
+        val expected = mapOf("label" to "Sluk", "items" to listOf(
+            mapOf("label" to "Sølvkroken", "items" to listOf(
+                mapOf("label" to "Spesial Classic", "items" to listOf(
+                    mapOf("label" to "Sølv", "items" to listOf(
+                        mapOf("label" to "12 g", "id" to 1, "type" to "Sluk", "brand" to "Sølvkroken", "name" to "Spesial Classic", "color" to "Sølv"),
+                        mapOf("label" to "15 g", "id" to 2, "type" to "Sluk", "brand" to "Sølvkroken", "name" to "Spesial Classic", "color" to "Sølv"),
+                    ))
+                ))
             ))
         ))
         // @formatter:on
@@ -164,6 +172,8 @@ class LureCatalogTreeTest {
         val leaf = Leaf(
             label = "Mark",
             id = 1,
+            type = LureType.MARK,
+            name = "Mark",
             rigs = listOf(Rig.OPPHENG, Rig.BUNNMEITE),
         )
 
@@ -171,6 +181,8 @@ class LureCatalogTreeTest {
             mapOf(
                 "label" to "Mark",
                 "id" to 1,
+                "type" to "Mark",
+                "name" to "Mark",
                 "rigs" to listOf("Oppheng", "Bunnmeite"),
             )
 
@@ -184,11 +196,15 @@ class LureCatalogTreeTest {
         val leaf = Leaf(
             label = "12 g",
             id = 1,
+            type = LureType.SLUK,
+            name = "Møresilda",
             rigs = emptyList(),
         )
 
         val expected = mapOf(
             "label" to "12 g",
+            "type" to "Sluk",
+            "name" to "Møresilda",
             "id" to 1,
         )
 

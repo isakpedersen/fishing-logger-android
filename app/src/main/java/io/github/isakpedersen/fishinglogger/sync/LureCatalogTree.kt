@@ -7,7 +7,15 @@ import io.github.isakpedersen.fishinglogger.data.Rig
 
 sealed interface CatalogItem
 data class Node(val label: String, val items: List<CatalogItem>) : CatalogItem
-data class Leaf(val label: String, val id: Long, val rigs: List<Rig> = emptyList()) : CatalogItem
+data class Leaf(
+    val label: String,
+    val id: Long,
+    val type: LureType,
+    val brand: String? = null,
+    val name: String,
+    val color: String? = null,
+    val rigs: List<Rig> = emptyList(),
+) : CatalogItem
 
 fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): List<CatalogItem> {
     val variantsByModel = variants.groupBy { it.lureModelId }
@@ -33,6 +41,10 @@ fun CatalogItem.toWire(): Map<String, Any> = when (this) {
     is Leaf -> buildMap {
         put("label", label)
         put("id", Math.toIntExact(id))
+        put("type", typeLabel(type))
+        if (brand != null) put("brand", brand)
+        put("name", name)
+        if (color != null) put("color", color)
         if (rigs.isNotEmpty()) put("rigs", rigs.map { it.wireName })
     }
     is Node -> mapOf("label" to label, "items" to items.map { it.toWire() })
@@ -57,6 +69,10 @@ private fun modelSubtree(model: LureModel, variants: List<LureVariant>): Catalog
                 Leaf(
                     label = leafLabel(it),
                     id = it.id,
+                    type = model.type,
+                    brand = model.brand,
+                    name = model.name,
+                    color = it.color,
                     rigs = rigs,
                 )
             }
