@@ -1,7 +1,6 @@
 package io.github.isakpedersen.fishinglogger.ui
 
 import android.database.sqlite.SQLiteConstraintException
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -13,10 +12,12 @@ import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureModelWithVariants
 import io.github.isakpedersen.fishinglogger.data.LureType
 import io.github.isakpedersen.fishinglogger.data.LureVariant
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,6 +26,9 @@ class LureCatalogViewModel(private val lureDao: LureDao) : ViewModel() {
 
     private val _expandedModelIds: MutableStateFlow<Set<Long>> = MutableStateFlow(emptySet())
     val expandedModelIds: StateFlow<Set<Long>> = _expandedModelIds.asStateFlow()
+
+    private val _events: Channel<String> = Channel(Channel.BUFFERED)
+    val events: Flow<String> = _events.receiveAsFlow()
 
     fun toggleModelExpanded(id: Long) {
         _expandedModelIds.update { ids -> if (id in ids) ids - id else ids + id }
@@ -50,24 +54,24 @@ class LureCatalogViewModel(private val lureDao: LureDao) : ViewModel() {
         }
     }
 
-    fun deleteModel(modelId: Long) {
+    fun deleteModel(modelId: Long, modelName: String) {
         viewModelScope.launch {
             try {
                 lureDao.deleteLureModel(modelId)
-                Log.i("LureCatalogViewModel", "deleted model $modelId") // TODO: replace with snackbar
+                _events.trySend("Slettet $modelName")
             } catch (e: SQLiteConstraintException) {
-                Log.w("LureCatalogViewModel", "could not delete model $modelId", e) // TODO: replace with snackbar
+                _events.trySend("Kunne ikke slette $modelName")
             }
         }
     }
 
-    fun deleteVariant(variantId: Long) {
+    fun deleteVariant(variantId: Long, variantName: String) {
         viewModelScope.launch {
             try {
                 lureDao.deleteLureVariant(variantId)
-                Log.i("LureCatalogViewModel", "deleted variant $variantId") // TODO: replace with snackbar
+                _events.trySend("Slettet $variantName")
             } catch (e: SQLiteConstraintException) {
-                Log.w("LureCatalogViewModel", "could not delete variant $variantId", e) // TODO: replace with snackbar
+                _events.trySend("Kunne ikke slette $variantName")
             }
         }
     }

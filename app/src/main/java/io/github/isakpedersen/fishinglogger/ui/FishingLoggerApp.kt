@@ -111,6 +111,11 @@ fun FishingLoggerApp() {
                     composable<LureCatalog> {
                         val vm: LureCatalogViewModel =
                             viewModel(factory = LureCatalogViewModel.Factory)
+                        LaunchedEffect(Unit) {
+                            vm.events.collect { message ->
+                                snackbarHostState.showSnackbar(message)
+                            }
+                        }
                         val catalog by vm.catalog.collectAsStateWithLifecycle(
                             initialValue = emptyList(),
                         )

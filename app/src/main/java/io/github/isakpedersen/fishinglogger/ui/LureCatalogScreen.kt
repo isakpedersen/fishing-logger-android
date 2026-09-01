@@ -50,14 +50,16 @@ fun LureCatalogScreen(
     onModelClick: (Long) -> Unit,
     onSaveModel: (LureType, String, String?) -> Unit,
     onSaveVariant: (Long, String?, Double?, Double?) -> Unit,
-    onDeleteModel: (Long) -> Unit,
-    onDeleteVariant: (Long) -> Unit,
+    onDeleteModel: (Long, String) -> Unit,
+    onDeleteVariant: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
     var addVariantForModelId by rememberSaveable { mutableStateOf<Long?>(null) }
     var deleteModelId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var deleteModelName by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteVariantId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var deleteVariantName by rememberSaveable { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = modifier,
@@ -89,7 +91,10 @@ fun LureCatalogScreen(
                         LureModelRow(
                             model = modelWithVariants.model,
                             onClick = { onModelClick(modelWithVariants.model.id) },
-                            onLongClick = { deleteModelId = modelWithVariants.model.id },
+                            onLongClick = {
+                                deleteModelId = modelWithVariants.model.id
+                                deleteModelName = formatLureModel(modelWithVariants.model)
+                            },
                             modifier = Modifier.fillParentMaxWidth(),
                         )
                     }
@@ -100,7 +105,10 @@ fun LureCatalogScreen(
                         ) { variant ->
                             LureVariantRow(
                                 variant = variant,
-                                onLongClick = { deleteVariantId = variant.id },
+                                onLongClick = {
+                                    deleteVariantId = variant.id
+                                    deleteVariantName = formatLure(modelWithVariants.model, variant)
+                                },
                                 modifier = Modifier
                                     .fillParentMaxWidth(),
                             )
@@ -145,24 +153,36 @@ fun LureCatalogScreen(
         )
     }
 
-    deleteModelId?.let { modelId ->
+    val modelId = deleteModelId
+    val modelName = deleteModelName
+    if (modelId != null && modelName != null) {
         DeleteLureDialog(
             label = "modell",
-            onDismiss = { deleteModelId = null },
-            onDelete = {
-                onDeleteModel(modelId)
+            onDismiss = {
                 deleteModelId = null
+                deleteModelName = null
+            },
+            onDelete = {
+                onDeleteModel(modelId, modelName)
+                deleteModelId = null
+                deleteModelName = null
             },
         )
     }
 
-    deleteVariantId?.let { variantId ->
+    val variantId = deleteVariantId
+    val variantName = deleteVariantName
+    if (variantId != null && variantName != null) {
         DeleteLureDialog(
             label = "variant",
-            onDismiss = { deleteVariantId = null },
-            onDelete = {
-                onDeleteVariant(variantId)
+            onDismiss = {
                 deleteVariantId = null
+                deleteVariantName = null
+            },
+            onDelete = {
+                onDeleteVariant(variantId, variantName)
+                deleteVariantId = null
+                deleteVariantName = null
             },
         )
     }
@@ -404,8 +424,8 @@ fun LureCatalogScreenPreview() {
             onModelClick = {},
             onSaveModel = { _, _, _ -> },
             onSaveVariant = { _, _, _, _ -> },
-            onDeleteModel = { _ -> },
-            onDeleteVariant = { _ -> },
+            onDeleteModel = { _, _ -> },
+            onDeleteVariant = { _, _ -> },
         )
     }
 }
