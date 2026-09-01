@@ -157,7 +157,7 @@ fun LureCatalogScreen(
     val modelName = deleteModelName
     if (modelId != null && modelName != null) {
         DeleteLureDialog(
-            label = "modell",
+            label = modelName,
             onDismiss = {
                 deleteModelId = null
                 deleteModelName = null
@@ -174,7 +174,7 @@ fun LureCatalogScreen(
     val variantName = deleteVariantName
     if (variantId != null && variantName != null) {
         DeleteLureDialog(
-            label = "variant",
+            label = variantName,
             onDismiss = {
                 deleteVariantId = null
                 deleteVariantName = null
