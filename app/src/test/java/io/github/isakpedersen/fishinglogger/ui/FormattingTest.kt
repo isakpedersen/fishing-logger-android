@@ -20,8 +20,16 @@ class FormattingTest {
     }
 
     @Test
-    fun `date is shown as date in Norwegian time zone`() {
-        assertEquals("2. september 2026", formatDate(LocalDate.of(2026, 9, 2)))
+    fun `date is shown as date in Norwegian format`() {
+        assertEquals("31. august 2026", formatDate(date = LocalDate.of(2026, 8, 31), today = LocalDate.of(2026, 9, 2)))
+    }
+
+    @Test
+    fun `today and yesterday are shown as relative labels`() {
+        assertEquals("I dag", formatDate(date = LocalDate.of(2026, 9, 2), today = LocalDate.of(2026, 9, 2)))
+        assertEquals("I går", formatDate(date = LocalDate.of(2026, 9, 1), today = LocalDate.of(2026, 9, 2)))
+        assertEquals("I går", formatDate(date = LocalDate.of(2026, 8, 31), today = LocalDate.of(2026, 9, 1)))
+        assertEquals("I går", formatDate(date = LocalDate.of(2025, 12, 31), today = LocalDate.of(2026, 1, 1)))
     }
 
     @Test

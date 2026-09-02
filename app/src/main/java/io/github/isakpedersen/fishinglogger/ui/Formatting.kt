@@ -16,7 +16,11 @@ fun formatTimestamp(epochSeconds: Long, zoneId: ZoneId = ZoneId.systemDefault())
 fun formatTime(epochSeconds: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
     Instant.ofEpochSecond(epochSeconds).atZone(zoneId).format(timeFormatter)
 
-fun formatDate(date: LocalDate): String = date.format(headerDateFormatter)
+fun formatDate(date: LocalDate, today: LocalDate = LocalDate.now()): String = when (date) {
+    today -> "I dag"
+    today.minusDays(1) -> "I går"
+    else -> date.format(headerDateFormatter)
+}
 
 fun localDateOf(epochSeconds: Long, zoneId: ZoneId = ZoneId.systemDefault()): LocalDate =
     Instant.ofEpochSecond(epochSeconds).atZone(zoneId).toLocalDate()
