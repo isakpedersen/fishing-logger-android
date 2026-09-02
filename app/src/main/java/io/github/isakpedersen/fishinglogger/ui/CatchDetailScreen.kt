@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +27,11 @@ import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CatchDetailScreen(uiState: CatchDetailUiState, modifier: Modifier = Modifier) {
+fun CatchDetailScreen(
+    uiState: CatchDetailUiState,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val catch = uiState.catch
     val lure = uiState.lure
 
@@ -32,6 +40,14 @@ fun CatchDetailScreen(uiState: CatchDetailUiState, modifier: Modifier = Modifier
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Fangst") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Tilbake",
+                        )
+                    }
+                },
                 windowInsets = WindowInsets(0.dp),
             )
         },
@@ -65,7 +81,7 @@ fun CatchDetailScreen(uiState: CatchDetailUiState, modifier: Modifier = Modifier
 fun CatchDetailScreenPreview() {
     FishingLoggerTheme {
         CatchDetailScreen(
-            CatchDetailUiState(
+            uiState = CatchDetailUiState(
                 Catch(
                     timestamp = 1784552603,
                     species = "Ørret",
@@ -92,6 +108,7 @@ fun CatchDetailScreenPreview() {
                     ),
                 ),
             ),
+            onBack = { },
         )
     }
 }
@@ -101,7 +118,8 @@ fun CatchDetailScreenPreview() {
 fun EmptyCatchDetailScreenPreview() {
     FishingLoggerTheme {
         CatchDetailScreen(
-            CatchDetailUiState(null, null),
+            uiState = CatchDetailUiState(null, null),
+            onBack = { },
         )
     }
 }
