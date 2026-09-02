@@ -61,14 +61,17 @@ fun FishingLoggerApp() {
             bottomBar = {
                 NavigationBar {
                     navigationTabs.forEach { tab ->
+                        val selected = currentEntry?.destination?.hasRoute(tab.route::class) == true
                         NavigationBarItem(
-                            selected = currentEntry?.destination?.hasRoute(tab.route::class) == true,
+                            selected = selected,
                             icon = { Icon(imageVector = tab.icon, contentDescription = null) },
                             label = { Text(tab.label) },
                             onClick = {
-                                navController.navigate(tab.route) {
-                                    popUpTo(id = navController.graph.findStartDestination().id)
-                                    launchSingleTop = true
+                                if (!selected) {
+                                    navController.navigate(tab.route) {
+                                        popUpTo(id = navController.graph.findStartDestination().id)
+                                        launchSingleTop = true
+                                    }
                                 }
                             },
                         )
