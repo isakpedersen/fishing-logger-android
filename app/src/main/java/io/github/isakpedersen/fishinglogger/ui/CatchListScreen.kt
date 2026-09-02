@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatchListScreen(
     catches: List<Catch>,
@@ -29,6 +32,12 @@ fun CatchListScreen(
 ) {
     Scaffold(
         modifier = modifier,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Fangster") },
+                windowInsets = WindowInsets(0.dp),
+            )
+        },
         contentWindowInsets = WindowInsets(0.dp),
     ) { innerPadding ->
         if (catches.isEmpty()) {

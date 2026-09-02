@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -43,6 +44,7 @@ import io.github.isakpedersen.fishinglogger.data.LureType
 import io.github.isakpedersen.fishinglogger.data.LureVariant
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LureCatalogScreen(
     catalog: List<LureModelWithVariants>,
@@ -63,6 +65,12 @@ fun LureCatalogScreen(
 
     Scaffold(
         modifier = modifier,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Slukkatalog") },
+                windowInsets = WindowInsets(0.dp),
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(
