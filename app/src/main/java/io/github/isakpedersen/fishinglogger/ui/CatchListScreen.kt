@@ -1,7 +1,7 @@
 package io.github.isakpedersen.fishinglogger.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,13 +16,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.Catch
+import io.github.isakpedersen.fishinglogger.ui.components.DeleteDialog
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 import java.time.LocalDate
 
@@ -31,9 +36,13 @@ import java.time.LocalDate
 fun CatchListScreen(
     catches: List<Catch>,
     onCatchClick: (Long) -> Unit,
+    onDeleteCatch: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var deleteCatchId by rememberSaveable { mutableStateOf<Long?>(null) }
+
     val grouped = remember(catches) { catches.groupBy { localDateOf(it.timestamp) } }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -67,16 +76,43 @@ fun CatchListScreen(
                         items = catchesOnDate,
                         key = { catch -> catch.timestamp },
                     ) { catch ->
-                        CatchRow(catch, onCatchClick, Modifier.fillParentMaxWidth())
+                        CatchRow(
+                            catch = catch,
+                            onClick = {
+                                onCatchClick(catch.id)
+                            },
+                            onLongClick = {
+                                deleteCatchId = catch.id
+                            },
+                            modifier = Modifier.fillParentMaxWidth(),
+                        )
                     }
                 }
             }
         }
     }
+
+    deleteCatchId?.let { catchId ->
+        DeleteDialog(
+            label = "fangst",
+            onDismiss = {
+                deleteCatchId = null
+            },
+            onDelete = {
+                onDeleteCatch(catchId)
+                deleteCatchId = null
+            },
+        )
+    }
 }
 
 @Composable
-private fun CatchRow(catch: Catch, onCatchClick: (Long) -> Unit, modifier: Modifier = Modifier) {
+private fun CatchRow(
+    catch: Catch,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     ListItem(
         headlineContent = { Text(formatSpecies(catch.species)) },
         overlineContent = { Text(formatTime(catch.timestamp)) },
@@ -89,7 +125,8 @@ private fun CatchRow(catch: Catch, onCatchClick: (Long) -> Unit, modifier: Modif
                 style = MaterialTheme.typography.titleMedium,
             )
         },
-        modifier = modifier.clickable { onCatchClick(catch.id) },
+        modifier = modifier
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
     )
 }
 
@@ -122,6 +159,7 @@ fun CatchListScreenPreview() {
                 ),
             ),
             onCatchClick = { },
+            onDeleteCatch = { },
         )
     }
 }

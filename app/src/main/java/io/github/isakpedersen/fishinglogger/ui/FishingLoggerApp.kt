@@ -90,12 +90,18 @@ fun FishingLoggerApp() {
                     composable<CatchList> {
                         val vm: CatchListViewModel =
                             viewModel(factory = CatchListViewModel.Factory)
+                        LaunchedEffect(Unit) {
+                            vm.events.collect { message ->
+                                snackbarHostState.showSnackbar(message)
+                            }
+                        }
                         val catches by vm.catches.collectAsStateWithLifecycle(initialValue = emptyList())
                         CatchListScreen(
                             catches = catches,
                             onCatchClick = { id ->
                                 navController.navigate(CatchDetail(id))
                             },
+                            onDeleteCatch = vm::deleteCatch,
                         )
                     }
 
