@@ -28,12 +28,10 @@ import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatchDetailScreen(
-    uiState: CatchDetailUiState,
+    uiState: CatchDetailUiState?,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val catch = uiState.catch
-    val lure = uiState.lure
 
     Scaffold(
         modifier = modifier,
@@ -53,7 +51,16 @@ fun CatchDetailScreen(
         },
         contentWindowInsets = WindowInsets(0.dp),
     ) { innerPadding ->
-        if (catch == null) {
+        if (uiState == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                // loading catch
+            }
+        } else if (uiState.catch == null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -63,6 +70,8 @@ fun CatchDetailScreen(
                 Text("Ingen fangst funnet.")
             }
         } else {
+            val catch = uiState.catch
+            val lure = uiState.lure
             Column(
                 modifier = Modifier.padding(innerPadding),
             ) {

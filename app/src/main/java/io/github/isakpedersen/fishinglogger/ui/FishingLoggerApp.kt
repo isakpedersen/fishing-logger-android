@@ -109,7 +109,7 @@ fun FishingLoggerApp() {
                         val vm: CatchDetailViewModel =
                             viewModel(factory = CatchDetailViewModel.Factory)
                         val uiState by vm.uiState.collectAsStateWithLifecycle(
-                            initialValue = CatchDetailUiState(null, null),
+                            initialValue = null,
                         )
                         CatchDetailScreen(uiState = uiState, onBack = { navController.navigateUp() })
                     }
