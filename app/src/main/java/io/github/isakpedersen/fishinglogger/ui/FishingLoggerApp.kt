@@ -67,11 +67,8 @@ fun FishingLoggerApp() {
                             label = { Text(tab.label) },
                             onClick = {
                                 navController.navigate(tab.route) {
-                                    popUpTo(id = navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
+                                    popUpTo(id = navController.graph.findStartDestination().id)
                                     launchSingleTop = true
-                                    restoreState = true
                                 }
                             },
                         )
