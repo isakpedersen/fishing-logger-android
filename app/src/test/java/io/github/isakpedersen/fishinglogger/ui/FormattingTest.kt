@@ -5,12 +5,44 @@ import io.github.isakpedersen.fishinglogger.data.LureType
 import io.github.isakpedersen.fishinglogger.data.LureVariant
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.time.LocalDate
 import java.time.ZoneId
 
 class FormattingTest {
     @Test
     fun `timestamp is shown as date and time in Norwegian time zone`() {
         assertEquals("15.07.2026 14:29", formatTimestamp(1784118584, ZoneId.of("Europe/Oslo")))
+    }
+
+    @Test
+    fun `time is shown as time in Norwegian time zone`() {
+        assertEquals("12:49", formatTime(1788346158, ZoneId.of("Europe/Oslo")))
+    }
+
+    @Test
+    fun `date is shown as date in Norwegian time zone`() {
+        assertEquals("2. september 2026", formatDate(LocalDate.of(2026, 9, 2)))
+    }
+
+    @Test
+    fun `localDateOf finds the right date around midnight`() {
+        assertEquals(LocalDate.of(2026, 9, 1), localDateOf(1788299999, ZoneId.of("Europe/Oslo")))
+        assertEquals(LocalDate.of(2026, 9, 2), localDateOf(1788300000, ZoneId.of("Europe/Oslo")))
+        assertEquals(LocalDate.of(2026, 9, 2), localDateOf(1788300001, ZoneId.of("Europe/Oslo")))
+    }
+
+    @Test
+    fun `localDateOf handles different timezones`() {
+        assertEquals(LocalDate.of(2026, 9, 1), localDateOf(1788303600, ZoneId.of("UTC")))
+        assertEquals(LocalDate.of(2026, 9, 2), localDateOf(1788303600, ZoneId.of("Europe/Oslo")))
+    }
+
+    @Test
+    fun `catch count handles singular and plural grammar`() {
+        assertEquals("0 fangster", formatCatchCount(0))
+        assertEquals("1 fangst", formatCatchCount(1))
+        assertEquals("2 fangster", formatCatchCount(2))
+        assertEquals("100 fangster", formatCatchCount(100))
     }
 
     @Test

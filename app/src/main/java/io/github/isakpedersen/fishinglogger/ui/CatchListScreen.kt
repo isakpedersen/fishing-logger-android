@@ -1,20 +1,22 @@
 package io.github.isakpedersen.fishinglogger.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,6 +33,7 @@ fun CatchListScreen(
     onCatchClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val grouped = remember(catches) { catches.groupBy { localDateOf(it.timestamp) } }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -53,12 +57,18 @@ fun CatchListScreen(
             LazyColumn(
                 contentPadding = innerPadding,
             ) {
-                items(
-                    items = catches,
-                    key = { catch -> catch.timestamp },
-                ) { catch ->
-                    CatchRow(catch, onCatchClick, Modifier.fillParentMaxWidth())
-                    HorizontalDivider()
+                grouped.forEach { (date, catchesOnDate) ->
+                    stickyHeader(
+                        key = "header-$date",
+                    ) {
+                        DateHeader(date, catchesOnDate.size)
+                    }
+                    items(
+                        items = catchesOnDate,
+                        key = { catch -> catch.timestamp },
+                    ) { catch ->
+                        CatchRow(catch, onCatchClick, Modifier.fillParentMaxWidth())
+                    }
                 }
             }
         }
@@ -69,7 +79,7 @@ fun CatchListScreen(
 private fun CatchRow(catch: Catch, onCatchClick: (Long) -> Unit, modifier: Modifier = Modifier) {
     ListItem(
         headlineContent = { Text(formatSpecies(catch.species)) },
-        overlineContent = { Text(formatTimestamp(catch.timestamp)) },
+        overlineContent = { Text(formatTime(catch.timestamp)) },
         supportingContent = if (catch.notes.isNullOrBlank()) null else {
             { Text(formatNotes(catch.notes), maxLines = 1, overflow = TextOverflow.Ellipsis) }
         },
@@ -80,6 +90,18 @@ private fun CatchRow(catch: Catch, onCatchClick: (Long) -> Unit, modifier: Modif
             )
         },
         modifier = modifier.clickable { onCatchClick(catch.id) },
+    )
+}
+
+@Composable
+private fun DateHeader(date: LocalDate, numberOfCatches: Int, modifier: Modifier = Modifier) {
+    Text(
+        text = "${formatDate(date)} (${formatCatchCount(numberOfCatches)})",
+        style = MaterialTheme.typography.labelLarge,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }
 
