@@ -95,7 +95,7 @@ fun FishingLoggerApp() {
                                 snackbarHostState.showSnackbar(message)
                             }
                         }
-                        val catches by vm.catches.collectAsStateWithLifecycle(initialValue = emptyList())
+                        val catches by vm.catches.collectAsStateWithLifecycle(initialValue = null)
                         CatchListScreen(
                             catches = catches,
                             onCatchClick = { id ->

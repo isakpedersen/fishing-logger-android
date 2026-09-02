@@ -34,14 +34,14 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatchListScreen(
-    catches: List<Catch>,
+    catches: List<Catch>?,
     onCatchClick: (Long) -> Unit,
     onDeleteCatch: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var deleteCatchId by rememberSaveable { mutableStateOf<Long?>(null) }
 
-    val grouped = remember(catches) { catches.groupBy { localDateOf(it.timestamp) } }
+    val grouped = remember(catches) { catches.orEmpty().groupBy { localDateOf(it.timestamp) } }
 
     Scaffold(
         modifier = modifier,
@@ -53,7 +53,16 @@ fun CatchListScreen(
         },
         contentWindowInsets = WindowInsets(0.dp),
     ) { innerPadding ->
-        if (catches.isEmpty()) {
+        if (catches == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                // loading catches
+            }
+        } else if (catches.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
