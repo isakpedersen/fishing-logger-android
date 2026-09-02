@@ -42,6 +42,7 @@ import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureModelWithVariants
 import io.github.isakpedersen.fishinglogger.data.LureType
 import io.github.isakpedersen.fishinglogger.data.LureVariant
+import io.github.isakpedersen.fishinglogger.ui.components.DeleteDialog
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -164,7 +165,7 @@ fun LureCatalogScreen(
     val modelId = deleteModelId
     val modelName = deleteModelName
     if (modelId != null && modelName != null) {
-        DeleteLureDialog(
+        DeleteDialog(
             label = modelName,
             onDismiss = {
                 deleteModelId = null
@@ -181,7 +182,7 @@ fun LureCatalogScreen(
     val variantId = deleteVariantId
     val variantName = deleteVariantName
     if (variantId != null && variantName != null) {
-        DeleteLureDialog(
+        DeleteDialog(
             label = variantName,
             onDismiss = {
                 deleteVariantId = null
@@ -338,26 +339,6 @@ private fun AddLureVariantDialog(
             ) {
                 Text("Avbryt")
             }
-        },
-    )
-}
-
-@Composable
-private fun DeleteLureDialog(
-    label: String,
-    onDismiss: () -> Unit,
-    onDelete: () -> Unit,
-) {
-    AlertDialog(
-        text = {
-            Text("Vil du slette $label?")
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDelete) { Text("Slett") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Avbryt") }
         },
     )
 }
