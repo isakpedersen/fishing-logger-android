@@ -115,13 +115,18 @@ private fun CatchRow(
 ) {
     ListItem(
         headlineContent = { Text(formatSpecies(catch.species)) },
-        overlineContent = { Text(formatTime(catch.timestamp)) },
         supportingContent = if (catch.notes.isNullOrBlank()) null else {
             { Text(formatNotes(catch.notes), maxLines = 1, overflow = TextOverflow.Ellipsis) }
         },
+        leadingContent = {
+            Text(
+                text = formatTime(catch.timestamp),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        },
         trailingContent = {
             Text(
-                formatWeight(catch.weight),
+                text = formatWeight(catch.weight),
                 style = MaterialTheme.typography.titleMedium,
             )
         },
