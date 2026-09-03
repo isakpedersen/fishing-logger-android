@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.ui.components.DeleteDialog
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 
@@ -54,6 +57,9 @@ fun CatchListScreen(
     onDeleteCatch: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
     var addCatchTimestamp by rememberSaveable { mutableStateOf<Long?>(null) }
     var deleteCatchId by rememberSaveable { mutableStateOf<Long?>(null) }
 
@@ -101,6 +107,7 @@ fun CatchListScreen(
             }
         } else {
             LazyColumn(
+                state = listState,
                 contentPadding = innerPadding,
             ) {
                 grouped.forEach { (date, catchesOnDate) ->
@@ -136,6 +143,9 @@ fun CatchListScreen(
             onSave = { catch ->
                 onSaveCatch(catch)
                 addCatchTimestamp = null
+                scope.launch {
+                    listState.animateScrollToItem(0)
+                }
             },
         )
     }
