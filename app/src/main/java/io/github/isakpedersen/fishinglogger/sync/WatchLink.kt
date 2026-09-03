@@ -120,16 +120,18 @@ class WatchLink(
         try {
             connectIQ.sendMessage(watch, IQApp(WATCH_APP_UUID), message) { _, _, status ->
                 if (status == ConnectIQ.IQMessageStatus.SUCCESS) {
+                    onEvent("Sendte ${lureVariants.size} sluker til klokka")
                     Log.i(TAG, "lure_catalog sent")
                 } else {
+                    onEvent("Kunne ikke sende sluker")
                     Log.w(TAG, "lure_catalog send failed: ${status.name}")
                 }
             }
         } catch (e: InvalidStateException) {
-            onStatus("Kunne ikke sende sluker. SDK i ugyldig tilstand")
+            onEvent("Kunne ikke sende sluker. SDK i ugyldig tilstand")
             Log.w(TAG, "lure_catalog send failed", e)
         } catch (e: ServiceUnavailableException) {
-            onStatus("Kunne ikke sende sluker. Får ikke kontakt med Garmin Connect")
+            onEvent("Kunne ikke sende sluker. Får ikke kontakt med Garmin Connect")
             Log.w(TAG, "lure_catalog send failed", e)
         }
     }
