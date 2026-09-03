@@ -56,7 +56,7 @@ fun CatchListScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Fangster") },
-                windowInsets = WindowInsets(0.dp),
+                windowInsets = WindowInsets(),
             )
         },
         floatingActionButton = {
@@ -71,7 +71,7 @@ fun CatchListScreen(
                 )
             }
         },
-        contentWindowInsets = WindowInsets(0.dp),
+        contentWindowInsets = WindowInsets(),
     ) { innerPadding ->
         if (catches == null) {
             Box(

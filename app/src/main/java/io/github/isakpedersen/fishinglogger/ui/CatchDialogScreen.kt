@@ -57,10 +57,10 @@ fun CatchDialogScreen(
                         Text("Lagre")
                     }
                 },
-                windowInsets = WindowInsets(0.dp),
+                windowInsets = WindowInsets(),
             )
         },
-        contentWindowInsets = WindowInsets(0.dp),
+        contentWindowInsets = WindowInsets(),
     ) { innerPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),

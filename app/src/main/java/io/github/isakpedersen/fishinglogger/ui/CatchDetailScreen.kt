@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.data.Lure
 import io.github.isakpedersen.fishinglogger.data.LureModel
@@ -46,10 +45,10 @@ fun CatchDetailScreen(
                         )
                     }
                 },
-                windowInsets = WindowInsets(0.dp),
+                windowInsets = WindowInsets(),
             )
         },
-        contentWindowInsets = WindowInsets(0.dp),
+        contentWindowInsets = WindowInsets(),
     ) { innerPadding ->
         if (uiState == null) {
             Box(

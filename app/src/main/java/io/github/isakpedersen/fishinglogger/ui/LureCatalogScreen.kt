@@ -68,7 +68,7 @@ fun LureCatalogScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Slukkatalog") },
-                windowInsets = WindowInsets(0.dp),
+                windowInsets = WindowInsets(),
             )
         },
         floatingActionButton = {
@@ -79,7 +79,7 @@ fun LureCatalogScreen(
                 )
             }
         },
-        contentWindowInsets = WindowInsets(0.dp),
+        contentWindowInsets = WindowInsets(),
     ) { innerPadding ->
         if (catalog.isEmpty()) {
             Box(
