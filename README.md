@@ -5,8 +5,9 @@ Android companion app for [Fishing Logger Garmin](https://github.com/isakpederse
 ## Features
 
 - Catch list screen
-    - View all catches received from [Fishing Logger Garmin](https://github.com/isakpedersen/fishing-logger-garmin)
+    - View all catches received from [Fishing Logger Garmin](https://github.com/isakpedersen/fishing-logger-garmin), grouped by date
     - Click on a catch to view its details (timestamp, species, weight, lure, notes)
+    - Delete catches
 - Lure catalog screen
     - View lure catalog
     - Add new lure models and variants (type, name, brand, color, weight, length)
