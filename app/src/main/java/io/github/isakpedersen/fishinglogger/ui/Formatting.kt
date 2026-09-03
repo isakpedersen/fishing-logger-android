@@ -52,15 +52,12 @@ fun formatLure(model: LureModel, variant: LureVariant): String {
     ).joinToString(" ")
 }
 
-fun formatLureModel(model: LureModel): String {
-    val type = model.type.name.lowercase().replaceFirstChar { it.uppercaseChar() }
-
-    return listOfNotNull(
-        "($type)",
+fun formatLureModel(model: LureModel): String =
+    listOfNotNull(
+        "(${model.type.label})",
         model.brand,
         model.name,
     ).joinToString(" ")
-}
 
 fun formatLureVariant(variant: LureVariant): String {
     val weight = variant.weight?.let { formatMeasurement(it, "g") }

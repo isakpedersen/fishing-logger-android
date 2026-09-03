@@ -25,7 +25,7 @@ fun composeLureCatalog(models: List<LureModel>, variants: List<LureVariant>): Li
     return modelsByType.map { (type, modelsOfType) ->
         val modelsByBrand = modelsOfType.groupBy { it.brand }
         Node(
-            label = typeLabel(type),
+            label = type.label,
             items = modelsByBrand.map { (brand, modelsOfBrand) ->
                 val brandLabel = brand ?: "Uten merke"
                 Node(
@@ -41,21 +41,13 @@ fun CatalogItem.toWire(): Map<String, Any> = when (this) {
     is Leaf -> buildMap {
         put("label", label)
         put("id", Math.toIntExact(id))
-        put("type", typeLabel(type))
+        put("type", type.label)
         if (brand != null) put("brand", brand)
         put("name", name)
         if (color != null) put("color", color)
         if (rigs.isNotEmpty()) put("rigs", rigs.map { it.wireName })
     }
     is Node -> mapOf("label" to label, "items" to items.map { it.toWire() })
-}
-
-private fun typeLabel(type: LureType): String = when (type) {
-    LureType.SLUK -> "Sluk"
-    LureType.SPINNER -> "Spinner"
-    LureType.WOBBLER -> "Wobbler"
-    LureType.FLUE -> "Flue"
-    LureType.MARK -> "Mark"
 }
 
 private fun modelSubtree(model: LureModel, variants: List<LureVariant>): CatalogItem {

@@ -18,7 +18,13 @@ data class LureModel(
 )
 
 /** Constant names are persisted as TEXT — renaming after real data exists is a data migration. */
-enum class LureType { SLUK, SPINNER, WOBBLER, FLUE, MARK }
+enum class LureType(val label: String) {
+    SLUK("Sluk"),
+    SPINNER("Spinner"),
+    WOBBLER("Wobbler"),
+    FLUE("Flue"),
+    MARK("Mark"),
+}
 
 /** A lure variant, e.g. "(Sluk) Remen Møresilda C/R 10 g". */
 @Entity(
