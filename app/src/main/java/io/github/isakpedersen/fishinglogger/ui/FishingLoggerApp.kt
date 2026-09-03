@@ -101,6 +101,7 @@ fun FishingLoggerApp() {
                             onCatchClick = { id ->
                                 navController.navigate(CatchDetail(id))
                             },
+                            onSaveCatch = vm::addCatch,
                             onDeleteCatch = vm::deleteCatch,
                         )
                     }
@@ -111,7 +112,10 @@ fun FishingLoggerApp() {
                         val uiState by vm.uiState.collectAsStateWithLifecycle(
                             initialValue = null,
                         )
-                        CatchDetailScreen(uiState = uiState, onBack = { navController.navigateUp() })
+                        CatchDetailScreen(
+                            uiState = uiState,
+                            onBack = { navController.navigateUp() },
+                        )
                     }
 
                     composable<LureCatalog> {

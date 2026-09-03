@@ -17,6 +17,9 @@ interface CatchDao {
     @Query("SELECT * FROM Catch WHERE id = :id")
     fun getById(id: Long): Flow<Catch?>
 
+    @Insert
+    suspend fun insertCatch(catch: Catch): Long
+
     @Query("DELETE FROM Catch WHERE id = :id")
     suspend fun deleteCatch(id: Long): Int
 }
