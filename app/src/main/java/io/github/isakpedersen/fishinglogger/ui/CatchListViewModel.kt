@@ -1,6 +1,5 @@
 package io.github.isakpedersen.fishinglogger.ui
 
-import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -19,17 +18,6 @@ class CatchListViewModel(private val catchDao: CatchDao) : ViewModel() {
 
     private val _events: Channel<String> = Channel(Channel.BUFFERED)
     val events: Flow<String> = _events.receiveAsFlow()
-
-    fun addCatch(catch: Catch) {
-        viewModelScope.launch {
-            try {
-                catchDao.insertCatch(catch)
-                _events.trySend("La til ${formatCatchLabel(catch)}")
-            } catch (_: SQLiteConstraintException) {
-                _events.trySend("Kunne ikke legge til fangst")
-            }
-        }
-    }
 
     fun deleteCatch(id: Long) {
         viewModelScope.launch {

@@ -1,6 +1,5 @@
 package io.github.isakpedersen.fishinglogger.ui
 
-import io.github.isakpedersen.fishinglogger.data.Catch
 import io.github.isakpedersen.fishinglogger.data.LureModel
 import io.github.isakpedersen.fishinglogger.data.LureVariant
 import java.math.RoundingMode
@@ -30,9 +29,6 @@ fun formatCatchCount(catchCount: Int): String {
     val catchNoun = if (catchCount == 1) "fangst" else "fangster"
     return "$catchCount $catchNoun"
 }
-
-fun formatCatchLabel(catch: Catch): String =
-    catch.species ?: "fangst"
 
 fun formatSpecies(species: String?): String = species ?: "–"
 

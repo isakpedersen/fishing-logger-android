@@ -3,6 +3,7 @@ package io.github.isakpedersen.fishinglogger.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Star
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.isakpedersen.fishinglogger.ui.theme.FishingLoggerTheme
+import kotlinx.coroutines.launch
 
 private data class NavigationTab(val route: Any, val label: String, val icon: ImageVector)
 
@@ -54,6 +57,8 @@ fun FishingLoggerApp() {
 
     val navController = rememberNavController()
     val currentEntry by navController.currentBackStackEntryAsState()
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     FishingLoggerTheme {
         Scaffold(
@@ -98,10 +103,11 @@ fun FishingLoggerApp() {
                         val catches by vm.catches.collectAsStateWithLifecycle(initialValue = null)
                         CatchListScreen(
                             catches = catches,
+                            listState = listState,
                             onCatchClick = { id ->
                                 navController.navigate(CatchDetail(id))
                             },
-                            onSaveCatch = vm::addCatch,
+                            onAddCatch = { navController.navigate(CatchDialog) },
                             onDeleteCatch = vm::deleteCatch,
                         )
                     }
@@ -115,6 +121,34 @@ fun FishingLoggerApp() {
                         CatchDetailScreen(
                             uiState = uiState,
                             onBack = { navController.navigateUp() },
+                        )
+                    }
+
+                    composable<CatchDialog> {
+                        val vm: CatchDialogViewModel =
+                            viewModel(factory = CatchDialogViewModel.Factory)
+                        LaunchedEffect(Unit) {
+                            vm.events.collect { message ->
+                                snackbarHostState.showSnackbar(message)
+                            }
+                        }
+                        val uiState by vm.uiState.collectAsStateWithLifecycle(
+                            initialValue = CatchDialogUiState(),
+                        )
+                        CatchDialogScreen(
+                            uiState = uiState,
+                            onBack = { navController.navigateUp() },
+                            onSave = {
+                                vm.save(
+                                    onSaved = {
+                                        navController.navigateUp()
+                                        scope.launch { listState.scrollToItem(0) }
+                                    },
+                                )
+                            },
+                            onSpeciesChange = vm::onSpeciesChange,
+                            onWeightChange = vm::onWeightChange,
+                            onNotesChange = vm::onNotesChange,
                         )
                     }
 
