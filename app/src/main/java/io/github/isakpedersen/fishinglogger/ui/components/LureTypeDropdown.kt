@@ -30,7 +30,7 @@ internal fun LureTypeDropdown(
         modifier = modifier,
     ) {
         OutlinedTextField(
-            value = selected.name,
+            value = selected.label,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
@@ -43,7 +43,7 @@ internal fun LureTypeDropdown(
         ) {
             LureType.entries.forEach { lureType ->
                 DropdownMenuItem(
-                    text = { Text(lureType.name) },
+                    text = { Text(lureType.label) },
                     onClick = {
                         onSelect(lureType)
                         expanded = false
